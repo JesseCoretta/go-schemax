@@ -285,7 +285,7 @@ func ExampleNameForm_Map() {
 /*
 This example demonstrates use of the [NameForms.Maps] method, which
 produces slices of [DefinitionMap] instances born of the [NameForms]
-stack in which they reside. 
+stack in which they reside.
 */
 func ExampleNameForms_Maps() {
 	defs := mySchema.NameForms().Maps()

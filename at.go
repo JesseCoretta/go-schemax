@@ -1020,7 +1020,7 @@ This is a fluent method.
 */
 func (r AttributeType) SetMinimumUpperBounds(mub any) AttributeType {
 	if !r.IsZero() {
-                if syn := r.EffectiveSyntax(); syn.HumanReadable() { 
+		if syn := r.EffectiveSyntax(); syn.HumanReadable() {
 			r.attributeType.setMinimumUpperBounds(mub)
 		}
 	}
