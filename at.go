@@ -1001,6 +1001,9 @@ func (r AttributeType) String() (def string) {
 MinimumUpperBounds returns the unsigned integer form of the receiver's
 "size limit", if set. A non-zero value indicates a specific maximum
 has been declared.
+
+Note that this method can only be used upon a receiver instance that
+has an effective [LDAPSyntax] known to be human-readable.
 */
 func (r AttributeType) MinimumUpperBounds() (mub uint) {
 	if !r.IsZero() {
@@ -1018,7 +1021,9 @@ This is a fluent method.
 */
 func (r AttributeType) SetMinimumUpperBounds(mub any) AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setMinimumUpperBounds(mub)
+                if syn := r.EffectiveSyntax(); syn.HumanReadable() { 
+			r.attributeType.setMinimumUpperBounds(mub)
+		}
 	}
 
 	return r

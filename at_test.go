@@ -268,8 +268,8 @@ func ExampleNewAttributeType() {
 		SetNumericOID(`1.3.6.1.4.1.56521.999.5`).
 		SetName(`cb`).
 		SetDescription(`Celestial Body`).
-		SetMinimumUpperBounds(64).
 		SetSyntax(dStr).
+		SetMinimumUpperBounds(64).
 		SetEquality(cIM).
 		SetSingleValue(true).
 		SetExtension(`X-ORIGIN`, `NOWHERE`).
@@ -802,7 +802,7 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleAttributeType_SetMinimumUpperBounds() {
 	// First we'll craft a fake attribute
-	raw := `( 1.3.6.1.4.1.56521.999.14.56.1
+	raw := `( 1.3.6.1.4.1.56521.999.14.56.5
 		NAME 'coolattr'
 		SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )`
 
