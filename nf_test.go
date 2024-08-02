@@ -42,7 +42,7 @@ func ExampleNameForm_Compliant() {
 }
 
 /*
-This example demonstrates a compliancy check of all [ObjectClasses] members.
+This example demonstrates a compliancy check of all [NameForms] members.
 
 Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
@@ -247,7 +247,7 @@ func ExampleNameForm_SetObsolete() {
 
 /*
 This example demonstrates a means of checking whether a particular instance
-of [ObjectClass] is present within an instance of [ObjectClasses].
+of [NameForm] is present within an instance of [NameForms].
 
 Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
@@ -283,11 +283,9 @@ func ExampleNameForm_Map() {
 }
 
 /*
-This example demonstrates use of the [ObjectClasses.Maps] method, which
-produces slices of [DefinitionMap] instances born of the [ObjectClasses]
-stack in which they reside.  We (quite recklessly) call index three (3)
-and reference index zero (0) of its `SYNTAX` key to obtain the relevant
-[LDAPSyntax] OID string value.
+This example demonstrates use of the [NameForms.Maps] method, which
+produces slices of [DefinitionMap] instances born of the [NameForms]
+stack in which they reside. 
 */
 func ExampleNameForms_Maps() {
 	defs := mySchema.NameForms().Maps()

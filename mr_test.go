@@ -315,7 +315,7 @@ func ExampleMatchingRules_Type() {
 
 /*
 This example demonstrates the means of accessing the integer length of
-an [MatchingRules] stack instance.
+a [MatchingRules] stack instance.
 
 Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.

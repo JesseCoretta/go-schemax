@@ -401,7 +401,7 @@ func ExampleDITStructureRule_Parse() {
 }
 
 /*
-This example demonstrates the replacement process of an [DITStructureRule]
+This example demonstrates the replacement process of a [DITStructureRule]
 instance within an instance of [DITStructureRules].
 
 For reasons of oversight, we've added a custom extension X-WARNING to

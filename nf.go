@@ -123,7 +123,7 @@ However certain migration efforts, schema audits and other such activities
 may require distinct associations of [NameForm] instances with specific
 [Schema] instances. Use of this function allows the user to specify the
 appropriate [Schema] instance at a later point for a specific instance of
-an [NameForm] instance.
+a [NameForm] instance.
 */
 func NewNameForm() NameForm {
 	nf := NameForm{newNameForm()}
@@ -219,9 +219,14 @@ func (r NameForms) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.7.2 of RFC 4512:
+compliant per the required clauses of [§ 4.1.7.2 of RFC 4512]:
 
-  - Numeric OID must be present and valid
+  - Numeric OID is present and valid
+  - Structural [ObjectClass] is compliant
+  - MUST clause has at least one (1) [AttributeType]
+  - MAY and MUST clause [AttributeType] instances are compliant
+
+[§ 4.1.7.2 of RFC 4512]: https://datatracker.ietf.org/doc/html/rfc4512#section-4.1.7.2
 */
 func (r NameForm) Compliant() bool {
 	if r.IsZero() {

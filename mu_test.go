@@ -154,7 +154,7 @@ func ExampleMatchingRuleUses_Type() {
 
 /*
 This example demonstrates the means of accessing the integer length of
-an [MatchingRuleUses] stack instance.
+a [MatchingRuleUses] stack instance.
 
 Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
@@ -345,7 +345,7 @@ func ExampleMatchingRuleUses_Maps() {
 }
 
 /*
-This example demonstrates the means of transferring an [MatchingRuleUse]
+This example demonstrates the means of transferring a [MatchingRuleUse]
 into an instance of [DefinitionMap].
 
 Note: this example assumes a legitimate schema variable is defined
@@ -359,7 +359,7 @@ func ExampleMatchingRuleUse_Map() {
 
 /*
 This example demonstrates the creation of an [Inventory] instance based
-upon the current contents of an [MatchingRuleUses] stack instance.  Use
+upon the current contents of a [MatchingRuleUses] stack instance.  Use
 of an [Inventory] instance is convenient in cases where a receiver of
 schema information may not be able to directly receive working stack
 instances and requires a more portable and generalized type.

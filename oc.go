@@ -34,8 +34,7 @@ func NewObjectClasses() ObjectClasses {
 
 /*
 NewObjectClassOIDList initializes and returns a new [ObjectClasses] that
-has been cast from an instance of [OIDList] and configured to allow the
-storage of arbitrary [ObjectClass] instances.
+has been configured to allow the storage of arbitrary [ObjectClass] instances.
 */
 func NewObjectClassOIDList(label ...string) ObjectClasses {
 	name := `oc_oidlist`
@@ -95,7 +94,7 @@ Note that the receiver MUST possess a [Schema] reference prior to the execution
 of this method.
 
 Also note that successful execution of this method does NOT automatically push
-the receiver into any [ObjectClasss] stack, nor does it automatically execute
+the receiver into any [ObjectClass] stack, nor does it automatically execute
 the [ObjectClass.SetStringer] method, leaving these tasks to the user.  If the
 automatic handling of these tasks is desired, see the [Schema.ParseObjectClass]
 method as an alternative.
@@ -501,9 +500,12 @@ func (r ObjectClasses) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.1 of RFC 4512:
+compliant per the required clauses of [§ 4.1.1 of RFC 4512]:
 
   - Numeric OID must be present and valid
+  - MUST and MAY clause [AttributeTypes] are compliant
+
+[§ 4.1.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.1
 */
 func (r ObjectClass) Compliant() bool {
 	if r.IsZero() {

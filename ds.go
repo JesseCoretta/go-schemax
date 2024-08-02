@@ -198,12 +198,14 @@ func (r DITStructureRules) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.7.1 of RFC 4512:
+compliant per the required clauses of [§ 4.1.7.1 of RFC 4512]:
 
   - "rule ID" must be specified in the form of an unsigned integer of any magnitude
   - FORM clause MUST refer to a known [NameForm] instance within the associated [Schema] instance
   - FORM clause MUST refer to a COMPLIANT [NameForm]
   - FORM must not violate, or be violated by, a relevant [DITContentRule] within the associated [Schema] instance
+
+[§ 4.1.7.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.7.1
 */
 func (r DITStructureRule) Compliant() bool {
 	// presence of ruleid is guaranteed via
@@ -740,7 +742,7 @@ However certain migration efforts, schema audits and other such activities
 may require distinct associations of [DITStructureRule] instances with specific
 [Schema] instances. Use of this function allows the user to specify the
 appropriate [Schema] instance at a later point for a specific instance of
-an [DITStructureRule] instance.
+a [DITStructureRule] instance.
 */
 func NewDITStructureRule() DITStructureRule {
 	ds := DITStructureRule{newDITStructureRule()}
@@ -903,8 +905,8 @@ func (r DITStructureRules) push(x any) (err error) {
 }
 
 /*
-Contains calls [Contains.Get] to return a Boolean value indicative of
-a successful, non-zero retrieval of an [DITStructureRules] instance --
+Contains calls [DITStructureRules.Get] to return a Boolean value indicative
+of a successful, non-zero retrieval of a [DITStructureRules] instance --
 matching the provided id -- from within the receiver stack instance.
 */
 func (r DITStructureRules) Contains(id string) bool {
@@ -920,7 +922,7 @@ Get returns an instance of [DITStructureRule] based upon a search for id within
 the receiver stack instance.
 
 The return instance, if not nil, was retrieved based upon a textual match of
-the principal identifier of an [DITStructureRule] and the provided id.
+the principal identifier of a [DITStructureRule] and the provided id.
 
 The return instance is nil if no match was made.
 

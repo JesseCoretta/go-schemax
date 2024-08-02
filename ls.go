@@ -54,7 +54,7 @@ func (r LDAPSyntaxes) len() int {
 
 /*
 Contains calls [MatchingRules.Get] to return a Boolean value indicative of
-a successful, non-zero retrieval of an [MatchingRule] instance -- matching
+a successful, non-zero retrieval of a [MatchingRule] instance -- matching
 the provided id -- from within the receiver stack instance.
 */
 func (r LDAPSyntaxes) Contains(id string) bool {
@@ -156,9 +156,11 @@ func (r LDAPSyntaxes) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.5 of RFC 4512:
+compliant per the required clauses of [§ 4.1.5 of RFC 4512]:
 
   - Numeric OID must be present and valid
+
+[§ 4.1.5 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.5
 */
 func (r LDAPSyntax) Compliant() bool {
 	if r.IsZero() {

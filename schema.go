@@ -52,7 +52,7 @@ func NewSchema(o ...Option) (r Schema) {
 /*
 NewBasicSchema initializes and returns an instance of [Schema].
 
-The Schema instance shall only contain the [LDAPSyntax] and
+The [Schema] instance shall only contain the [LDAPSyntax] and
 [MatchingRule] definitions from the following RFCs:
 
   - RFC 2307

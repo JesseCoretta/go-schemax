@@ -150,26 +150,32 @@ of this type need not be handled by users directly.
 type oIDList stackage.Stack
 
 /*
-RuleIDList implements ruleidlist per § 4.1.7.1 of RFC 4512.
+RuleIDList implements ruleidlist per [§ 4.1.7.1 of RFC 4512].
 Instances of this type need not be handled by users directly.
 
 	ruleidlist = ruleid *( SP ruleid )
+
+[§ 4.1.7.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.7.1
 */
 type RuleIDList stackage.Stack
 
 /*
-QuotedDescriptorList implements qdescrlist per § 4.1 of RFC 4512.
+QuotedDescriptorList implements qdescrlist per [§ 4.1 of RFC 4512].
 Instances of this type need not be handled by users directly.
 
 	qdescrlist = [ qdescr *( SP qdescr ) ]
+
+[§ 4.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1
 */
 type QuotedDescriptorList stackage.Stack
 
 /*
-QuotedStringList implements qdstringlist per § 4.1 of RFC 4512.
+QuotedStringList implements qdstringlist per [§ 4.1 of RFC 4512].
 Instances of this type need not be handled by users directly.
 
 	qdstringlist = [ qdstring *( SP qdstring ) ]
+
+[§ 4.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1
 */
 type QuotedStringList stackage.Stack
 
@@ -181,9 +187,11 @@ handled by users directly.
 type collection stackage.Stack
 
 /*
-Extensions implements extensions as defined in § 4.1 of RFC 4512:
+Extensions implements extensions as defined in [§ 4.1 of RFC 4512]:
 
 	extensions = *( SP xstring SP qdstrings )
+
+[§ 4.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1
 */
 type Extensions stackage.Stack
 
@@ -193,15 +201,17 @@ Extension is the singular (slice) form of [Extensions], and contains the followi
   - One (1) instance of string (XString), declaring the effective "X-" name, AND ...
   - One (1) [QuotedStringList] stack instance, containing one (1) or more "qdstringlist" values
 
-The ABNF production for "xstring", per § 4.1 of RFC 4512, is as follows:
+The ABNF production for "xstring", per [§ 4.1 of RFC 4512], is as follows:
 
 	xstring	     = "X" HYPHEN 1*( ALPHA / HYPHEN / USCORE )
 
-The ABNF production for "qdstringlist", per § 4.1 of RFC 4512, is as follows:
+The ABNF production for "qdstringlist", per [§ 4.1 of RFC 4512], is as follows:
 
 	qdstringlist = [ qdstring *( SP qdstring ) ]
 	qdstring     = SQUOTE dstring SQUOTE
 	dstring      = 1*( QS / QQ / QUTF8 )   ; escaped UTF-8 string
+
+[§ 4.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1
 */
 type Extension struct {
 	*extension
@@ -263,7 +273,7 @@ representing an entire type-specific stack (e.g.: [AttributeTypes]).
 type DefinitionMaps []DefinitionMap
 
 /*
-AttributeType implements § 4.1.2 of RFC 4512.
+AttributeType implements [§ 4.1.2 of RFC 4512].
 
 	AttributeTypeDescription = LPAREN WSP
 	    numericoid                    ; object identifier
@@ -330,6 +340,7 @@ From clause 13.4.8 of [ITU-T Rec. X.501]:
 			dSAOperation (3),
 			... }
 
+[§ 4.1.2 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.2
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type AttributeType struct {
@@ -361,7 +372,7 @@ type attributeType struct {
 }
 
 /*
-DITContentRule implements § 4.1.6 of RFC 4512.
+DITContentRule implements [§ 4.1.6 of RFC 4512].
 
 	DITContentRuleDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -390,6 +401,7 @@ From clause 13.8.2 of [ITU-T Rec. X.501]:
 		[MAY CONTAIN &Optional]
 		[MUST-NOT CONTAIN &Precluded] }
 
+[§ 4.1.6 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.6
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type DITContentRule struct {
@@ -414,7 +426,7 @@ type dITContentRule struct {
 }
 
 /*
-DITStructureRule implements § 4.1.7.1 of RFC 4512.
+DITStructureRule implements [§ 4.1.7.1 of RFC 4512].
 
 	DITStructureRuleDescription = LPAREN WSP
 	    ruleid                     ; rule identifier
@@ -450,6 +462,7 @@ From clause 13.7.6 of [ITU-T Rec. X.501]:
 		[SUPERIOR RULES &SuperiorStructureRules]
 		ID &id }
 
+[§ 4.1.7.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.7.1
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type DITStructureRule struct {
@@ -473,7 +486,7 @@ type dITStructureRule struct {
 type extensions map[string]QuotedStringList
 
 /*
-LDAPSyntax implements § 4.1.5 of RFC 4512.
+LDAPSyntax implements [§ 4.1.5 of RFC 4512].
 
 	SyntaxDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -492,6 +505,7 @@ From clause 13.12 of [ITU-T Rec. X.501]:
 		DIRECTORY SYNTAX &Type
 		ID &id }
 
+[§ 4.1.5 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.5
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type LDAPSyntax struct {
@@ -511,7 +525,7 @@ type lDAPSyntax struct {
 }
 
 /*
-MatchingRule implements § 4.1.3 of RFC 4512.
+MatchingRule implements [§ 4.1.3 of RFC 4512].
 
 	MatchingRuleDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -541,6 +555,7 @@ From clause 13.5.2 of [ITU-T Rec. X.501]:
 		[LDAP-DESC &ldapDesc]
 		ID &id }
 
+[§ 4.1.3 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.3
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type MatchingRule struct {
@@ -563,7 +578,7 @@ type matchingRule struct {
 }
 
 /*
-MatchingRuleUse implements § 4.1.4 of RFC 4512.
+MatchingRuleUse implements [§ 4.1.4 of RFC 4512].
 
 	MatchingRuleUseDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -598,6 +613,7 @@ From clause 13.6.2 of [ITU-T Rec. X.501]:
 		MATCHING RULE &matching-rule
 		ID &id }
 
+[§ 4.1.4 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.4
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type MatchingRuleUse struct {
@@ -618,7 +634,7 @@ type matchingRuleUse struct {
 }
 
 /*
-NameForm implements § 4.1.7.2 of RFC 4512.
+NameForm implements [§ 4.1.7.2 of RFC 4512].
 
 	NameFormDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -648,6 +664,7 @@ From clause 13.7.3 of [ITU-T Rec. X.501]:
 		[LDAP-DESC &ldapDesc]
 		ID &id }
 
+[§ 4.1.7.2 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.7.2
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type NameForm struct {
@@ -671,7 +688,7 @@ type nameForm struct {
 }
 
 /*
-ObjectClass implements § 4.1.1 of RFC 4512.
+ObjectClass implements [§ 4.1.1 of RFC 4512].
 
 	ObjectClassDescription = LPAREN WSP
 	    numericoid                 ; object identifier
@@ -706,6 +723,7 @@ From clause 13.4.8 of [ITU-T Rec. X.501]:
 		[LDAP-DESC &ldapDesc]
 		ID &id }
 
+[§ 4.1.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.1
 [ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 type ObjectClass struct {

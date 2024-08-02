@@ -705,8 +705,7 @@ func NewAttributeTypes() AttributeTypes {
 
 /*
 NewAttributeTypeOIDList initializes and returns a new [AttributeTypes] that has
-been cast from an instance of [OIDList] and configured to allow the storage of
-arbitrary [AttributeType] instances.
+been configured to allow the storage of arbitrary [AttributeType] instances.
 */
 func NewAttributeTypeOIDList(label ...string) AttributeTypes {
 	name := `at_oidlist`
@@ -1118,7 +1117,7 @@ func (r AttributeType) Equality() (eql MatchingRule) {
 EffectiveEquality returns the EQUALITY [MatchingRule] instance held (directly or
 indirectly) by the receiver.
 
-If the receiver does not directly reference an [MatchingRule] instance, this method
+If the receiver does not directly reference a [MatchingRule] instance, this method
 walks the super type chain until it encounters a superior [AttributeType] which
 directly references an EQUALITY [MatchingRule].
 
@@ -1192,7 +1191,7 @@ func (r AttributeType) Substring() (sub MatchingRule) {
 EffectiveSubstring returns the SUBSTR [MatchingRule] instance held (directly or
 indirectly) by the receiver.
 
-If the receiver does not directly reference an [MatchingRule] instance, this method
+If the receiver does not directly reference a [MatchingRule] instance, this method
 walks the super type chain until it encounters a superior [AttributeType] which
 directly references a SUBSTR [MatchingRule].
 
@@ -1266,7 +1265,7 @@ func (r AttributeType) Ordering() (ord MatchingRule) {
 EffectiveOrdering returns the ORDERING [MatchingRule] instance held (directly or
 indirectly) by the receiver.
 
-If the receiver does not directly reference an [MatchingRule] instance, this method
+If the receiver does not directly reference a [MatchingRule] instance, this method
 walks the super type chain until it encounters a superior [AttributeType] which
 directly references an ORDERING [MatchingRule].
 
@@ -1638,7 +1637,7 @@ func (r AttributeTypes) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.2 of RFC 4512:
+compliant per the required clauses of [§ 4.1.2 of RFC 4512]:
 
   - Numeric OID must be present and valid
   - Specified EQUALITY, SUBSTR and ORDERING [MatchingRule] instances must be COMPLIANT
@@ -1646,6 +1645,8 @@ compliant per the required clauses of § 4.1.2 of RFC 4512:
 
 Additional consideration is given to RFC 3671 in that an [AttributeType]
 shall not be both COLLECTIVE and SINGLE-VALUE'd.
+
+[§ 4.1.2 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.2
 */
 func (r AttributeType) Compliant() bool {
 	if r.IsZero() {
@@ -1783,8 +1784,10 @@ func (r Schema) loadAttributeTypes() (err error) {
 }
 
 /*
-LoadX501AttributeTypes returns an error following an attempt to
-load all X.501 [AttributeType] slices into the receiver instance.
+LoadX501AttributeTypes returns an error following an attempt to load all
+[ITU-T Rec. X.501] [AttributeType] slices into the receiver instance.
+
+[ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
 */
 func (r Schema) LoadX501AttributeTypes() error {
 	return r.loadX501AttributeTypes()
@@ -1800,7 +1803,8 @@ func (r Schema) loadX501AttributeTypes() (err error) {
 
 	if want := x501AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of X.501 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of X.501 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1825,7 +1829,8 @@ func (r Schema) loadRFC2079AttributeTypes() (err error) {
 
 	if want := rfc2079AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC2079 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC2079 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1853,7 +1858,8 @@ func (r Schema) loadRFC2307AttributeTypes() (err error) {
 
 	if want := rfc2307AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC2307 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC2307 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1878,7 +1884,8 @@ func (r Schema) loadRFC2798AttributeTypes() (err error) {
 
 	if want := rfc2798AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC2798 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC2798 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1903,7 +1910,8 @@ func (r Schema) loadRFC3045AttributeTypes() (err error) {
 
 	if want := rfc3045AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC3045 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC3045 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1928,7 +1936,8 @@ func (r Schema) loadRFC3671AttributeTypes() (err error) {
 
 	if want := rfc3671AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC3671 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC3671 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1953,7 +1962,8 @@ func (r Schema) loadRFC3672AttributeTypes() (err error) {
 
 	if want := rfc3672AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC3672 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC3672 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -1978,7 +1988,8 @@ func (r Schema) loadRFC4512AttributeTypes() (err error) {
 
 	if want := rfc4512AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC4512 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC4512 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2003,7 +2014,8 @@ func (r Schema) loadRFC4519AttributeTypes() (err error) {
 
 	if want := rfc4519AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC4519 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC4519 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2028,7 +2040,8 @@ func (r Schema) loadRFC4523AttributeTypes() (err error) {
 
 	if want := rfc4523AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC4523 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC4523 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2053,7 +2066,8 @@ func (r Schema) loadRFC4524AttributeTypes() (err error) {
 
 	if want := rfc4524AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC4524 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC4524 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2078,7 +2092,8 @@ func (r Schema) loadRFC4530AttributeTypes() (err error) {
 
 	if want := rfc4530AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC4530 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC4530 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2103,7 +2118,8 @@ func (r Schema) loadRFC2589AttributeTypes() (err error) {
 
 	if want := rfc2589AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC2589 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC2589 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 
@@ -2128,7 +2144,8 @@ func (r Schema) loadRFC5020AttributeTypes() (err error) {
 
 	if want := rfc5020AttributeTypes.Len(); i != want {
 		if err == nil {
-			err = mkerr("Unexpected number of RFC5020 AttributeTypes parsed: want " + itoa(want) + ", got " + itoa(i))
+			err = mkerr("Unexpected number of RFC5020 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 

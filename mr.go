@@ -49,7 +49,7 @@ However certain migration efforts, schema audits and other such activities
 may require distinct associations of [MatchingRule] instances with specific
 [Schema] instances. Use of this function allows the user to specify the
 appropriate [Schema] instance at a later point for a specific instance of
-an [MatchingRule] instance.
+a [MatchingRule] instance.
 */
 func NewMatchingRule() MatchingRule {
 	mr := MatchingRule{newMatchingRule()}
@@ -821,9 +821,11 @@ func (r MatchingRules) Compliant() bool {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.3 of RFC 4512:
+compliant per the required clauses of [§ 4.1.3 of RFC 4512]:
 
   - Numeric OID must be present and valid
+
+[§ 4.1.3 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.3
 */
 func (r MatchingRule) Compliant() bool {
 	if r.IsZero() {
@@ -974,7 +976,7 @@ func (r MatchingRules) push(x any) (err error) {
 
 /*
 Contains calls [MatchingRules.Get] to return a Boolean value indicative of
-a successful, non-zero retrieval of an [MatchingRule] instance -- matching
+a successful, non-zero retrieval of a [MatchingRule] instance -- matching
 the provided id -- from within the receiver stack instance.
 */
 func (r MatchingRules) Contains(id string) bool {
@@ -1026,7 +1028,7 @@ Get returns an instance of [MatchingRule] based upon a search for id within
 the receiver stack instance.
 
 The return instance, if not nil, was retrieved based upon a textual match of
-the principal identifier of an [MatchingRule] and the provided id.
+the principal identifier of a [MatchingRule] and the provided id.
 
 The return instance is nil if no match was made.
 

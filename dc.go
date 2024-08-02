@@ -71,7 +71,7 @@ However certain migration efforts, schema audits and other such activities
 may require distinct associations of [DITContentRule] instances with specific
 [Schema] instances. Use of this function allows the user to specify the
 appropriate [Schema] instance at a later point for a specific instance of
-an [DITContentRule] instance.
+a [DITContentRule] instance.
 */
 func NewDITContentRule() DITContentRule {
 	dc := DITContentRule{newDITContentRule()}
@@ -456,7 +456,7 @@ func (r DITContentRule) StructuralClass() (soc ObjectClass) {
 
 /*
 Compliant returns a Boolean value indicative of the receiver being fully
-compliant per the required clauses of § 4.1.6 of RFC 4512:
+compliant per the required clauses of [§ 4.1.6 of RFC 4512]:
 
   - Numeric OID must relate to a predefined [ObjectClass] in the associated [Schema] instance
   - [ObjectClass] referenced by OID must be STRUCTURAL
@@ -464,6 +464,8 @@ compliant per the required clauses of § 4.1.6 of RFC 4512:
   - Collective [AttributeType] instances are permitted, but not verified as they are never present in any [ObjectClass]
   - MUST, MAY and NOT clause [AttributeType] instances are limited to those present in the [ObjectClass] super chain
   - No conflicting clause values (e.g.: cannot forbid (NOT) a required type (MUST)), with emphasis on related [DITStructureRule] FORM ([NameForm]) instances.
+
+[§ 4.1.6 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.6
 */
 func (r DITContentRule) Compliant() bool {
 	if r.IsZero() {
@@ -1140,7 +1142,7 @@ func (r DITContentRule) IsZero() bool {
 
 /*
 Contains calls [DITStructureRules.Get] to return a Boolean value indicative of
-a successful, non-zero retrieval of an [DITStructureRule] instance -- matching
+a successful, non-zero retrieval of a [DITStructureRule] instance -- matching
 the provided id -- from within the receiver stack instance.
 */
 func (r DITContentRules) Contains(id string) bool {
@@ -1156,7 +1158,7 @@ Get returns an instance of [DITContentRule] based upon a search for id within
 the receiver stack instance.
 
 The return instance, if not nil, was retrieved based upon a textual match of
-the principal identifier of an [DITContentRule] and the provided id.
+the principal identifier of a [DITContentRule] and the provided id.
 
 The return instance is nil if no match was made.
 
