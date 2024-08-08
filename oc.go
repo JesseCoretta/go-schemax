@@ -504,6 +504,7 @@ compliant per the required clauses of [§ 4.1.1 of RFC 4512]:
 
   - Numeric OID must be present and valid
   - MUST and MAY clause [AttributeTypes] are compliant
+  - MUST and MAY clause contains no Collective [AttributeType] instances
 
 [§ 4.1.1 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.1
 */
@@ -518,13 +519,13 @@ func (r ObjectClass) Compliant() bool {
 	)
 
 	for i := 0; i < must.Len(); i++ {
-		if !must.Index(i).Compliant() {
+		if !must.Index(i).Compliant() || must.Index(i).Collective() {
 			return false
 		}
 	}
 
 	for i := 0; i < may.Len(); i++ {
-		if !may.Index(i).Compliant() {
+		if !may.Index(i).Compliant() || may.Index(i).Collective() {
 			return false
 		}
 	}

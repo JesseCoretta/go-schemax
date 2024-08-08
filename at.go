@@ -1642,6 +1642,7 @@ compliant per the required clauses of [§ 4.1.2 of RFC 4512]:
   - Numeric OID must be present and valid
   - Specified EQUALITY, SUBSTR and ORDERING [MatchingRule] instances must be COMPLIANT
   - Specified [LDAPSyntax] MUST be COMPLIANT
+  - [AttributeType], if not COLLECTIVE, cannot extend from a COLLECTIVE super type
 
 Additional consideration is given to RFC 3671 in that an [AttributeType]
 shall not be both COLLECTIVE and SINGLE-VALUE'd.
@@ -1672,14 +1673,23 @@ func (r AttributeType) Compliant() bool {
 		}
 	}
 
+	collective := r.Collective()
 	sup := r.schema().AttributeTypes().get(r.SuperType().NumericOID())
-	if !sup.IsZero() && !sup.Compliant() {
-		return false
+	if !sup.IsZero() {
+		if sup.Collective() && !collective {
+			// Non collective types cannot derive from
+			// collective super types.
+			return false
+		}
+
+		if !sup.Compliant() {
+			return false
+		}
 	}
 
 	// Any combination of SV/C is permitted
 	// EXCEPT for BOTH.  See RFC 3671.
-	return !(r.SingleValue() && r.Collective())
+	return !(r.SingleValue() && collective)
 }
 
 /*
