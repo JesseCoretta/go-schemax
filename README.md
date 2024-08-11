@@ -54,45 +54,65 @@ The new (>=1.5.0) release branches introduce proper  `ParseRaw`, `ParseFile` and
 
 ```
 func main() {
-	r := NewSchema()
+	// Create a brand new schema *and* load it with
+	// standard RFC-sourced definitions.
+	mySchema := NewSchema()
 
-	// Let's parse a directory into our
-	// receiver instance of Schema (r).
-	schemaDir := "/home/you/ds/schema"
-	if err := r.ParseDirectory(schemaDir); err != nil {
+	// If your organization has any number of its own
+	// custom schema definitions, there are three (3)
+	// ways you could load them, each of which are
+	// covered below.
+
+	// By directory: a directory structure -- which may
+	// or may not contain subdirectories of its own --
+	// containing one or more ".schema" files, named in
+	// such a way that they remain naturally ordered in
+	// terms of super type, super class, and super rule
+	// dependencies.
+	schemaDir := "/home/you/ds/schemas"
+	if err := mySchema.ParseDirectory(schemaDir); err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// Check our definition counters
-	fmt.Printf("%s", r.Counters())
-	// Output:
-	// LS: 67
-	// MR: 44
-	// AT: 131
-	// MU: 29
-	// OC: 39
-	// DC: 1
-	// NF: 1
-	// DS: 1
+	// By file: a single file, which MUST end in ".schema",
+	// read using the Schema.ParseFile method.  Note the same
+	// dependency considerations described in the previous
+	// "directory" example shall apply here.
+	schemaFile := "/home/you/other.schema"
+	if err := mySchema.ParseFile(schemaFile); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// By bytes: a series of bytes previously read from a file
+	// or other source can be submitted to the Schema.ParseRaw
+	// method. Again, the same dependency considerations noted
+	// above shall apply here.
+	schemaBytes := []byte{...contents of some .schema file...}
+	if err := mySchema.ParseRaw(schemaBytes); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Take a snapshot of the current definition counts by
+	// category:
+	fmt.Printf("%#v\n", mySchema.Counters()
+	// Output: schemax.Counters{LS:67, MR:44, AT:317, MU:32, OC:80, DC:1, NF:13, DS:13}
 }
 ```
 
 Though the `ParseFile` function operates identically to the above-demonstrated `ParseDirectory` function, it is important to order the respective files and directories according to any applicable dependencies.  In other words, if "fileB.schema" requires definitions from "fileA.schema", "fileA.schema" must be parsed first.
 
-Sub-directories encountered shall be traversed indefinitely. The effective name of a given directory is not significant.
+Sub-directories encountered shall be traversed indefinitely and in their natural order according to name. Files encountered through directory traversal shall only be read and parsed IF the extension is ".schema".  This prevents other files -- such as text or `README.md` files -- from interfering with the parsing process needlessly. The same considerations related to ordering of directories by name applies to individual ".schema" files.
 
-Files encountered through directory traversal shall only be read and parsed IF the extension is ".schema".  This prevents other files -- such as text or `README.md` files -- from interfering with the parsing process needlessly.
+The general rule-of-thumb is suggests that if the `ls -l` Bash command _consistently_ lists the indicated schema files in correct order, _and_ assuming those files contain properly ordered and well-formed definitions, the parsing process should work nicely.
 
-An eligible schema file may contain one definition, or many. The effective name of an eligible schema file **is significant**, unlike directories.  Each schema file must be named in a manner that fosters the correct ordering of dependent definitions -- **_whether or not subdirectories are involved_**. To offer a real-world example, the 389DS/Netscape schema directory deployed during a typical installation is defined and governed in a similar manner.
-
-The general rule-of-thumb is suggests that if the `ls -l` Bash command _consistently_ lists the indicated schema files in correct order, and assuming those files contain properly ordered and well-formed definitions, the parsing process should work nicely.
-
-Alternatively, the `ParseRaw` method is ideal for parsing `[]byte` instances that have already been read from the filesystem in some manner, or written "in-line" such as for unit testing.
+The `ParseRaw` method is subject to the same conditions related to the order of dependent definitions.
 
 ## The Schema Itself
 
-The `Schema` type defined within this package is a [`stackage.Stack`](https://pkg.go.dev/github.com/JesseCoretta/go-stackage#Stack) derivative type.  An instance of a `Schema` can manifest in any of the following manners:
+The `Schema` type defined within this package is a [`stackage.Stack`](https://pkg.go.dev/github.com/JesseCoretta/go-stackage#Stack) derivative type. An instance of a `Schema` can manifest in any of the following manners:
 
   - As an empty (unpopulated) `Schema`, initialized by way of the `NewEmptySchema` function
   - As a basic (minimally populated) `Schema`, initialized by way of the `NewBasicSchema` function
@@ -138,13 +158,15 @@ This package does, however, include a default `Stringer`, which can be invoked f
 
 ## Fluent Methods
 
-This package extends fluent methods that are write-based in nature. Typically these methods are prefaced with `Set` or `Push`.  This means such methods may be "chained" together using the standard Go command "." delimiter.
+This package extends fluent methods that are write-based in nature. Typically these methods are prefaced with `Set` or `Push`. This means such methods may be "chained" together using the standard Go command "." delimiter.
 
-Fluency does not extend to methods that are interrogative in nature, in that they return `bool`, `string` or `error` values.  Fluency also precludes use of the `Registration` interface due to unique return signatures.
+Fluency does not extend to methods that are interrogative in nature, in that they return `bool`, `string` or `error` values. Fluency also precludes use of the `Definition` interface due to unique return signatures.
 
 ## Built-In Definitions
 
-The following table describes the contents and coverage of the so-called "built-in" schema definitions, all of which are sourced from recognized RFCs only. These can be imported en masse by users, or in piece-meal fashion.
+The following table describes the contents and coverage of the so-called "built-in" schema definitions, all of which are sourced from recognized RFCs only. These can be imported en masse by users, or in piece-meal fashion. At present, the library contains more than four hundred such definitions.
+
+Note that no `dITContentRule` definitions exist in any RFC at this time, thus none are available for import.
 
 | DOCUMENT | [LS](## "LDAP Syntaxes")  | [MR](## "Matching Rules")  | [AT](## "Attribute Types")  | [OC](## "Object Classes")  | [DC](## "DIT Content Rules")  | [NF](## "Name Forms")  | [DS](## "DIT Structure Rules")  |
 | -------- | :----: | :----: | :----: | :----: | :----: | :----: | :----:  |
@@ -154,6 +176,7 @@ The following table describes the contents and coverage of the so-called "built-
 | [![RFC 3045](https://img.shields.io/badge/RFC-3045-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc3045)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 3671](https://img.shields.io/badge/RFC-3671-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc3671)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 3672](https://img.shields.io/badge/RFC-3672-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc3672)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
+| [![RFC 4403](https://img.shields.io/badge/RFC-4403-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4403)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ✅  |  ✅  |
 | [![RFC 4512](https://img.shields.io/badge/RFC-4512-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4512)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 4517](https://img.shields.io/badge/RFC-4517-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4517)  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 4519](https://img.shields.io/badge/RFC-4519-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4519)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
@@ -161,3 +184,15 @@ The following table describes the contents and coverage of the so-called "built-
 | [![RFC 4524](https://img.shields.io/badge/RFC-4524-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4524)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 4530](https://img.shields.io/badge/RFC-4530-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc4530)  |  ✅  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 5020](https://img.shields.io/badge/RFC-5020-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc5020)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
+
+## A note about test latency
+
+The go-schemax package contains well over two hundred unit tests/examples. When performing a full run of `go test`, it takes approxiately one (1) second to complete.  The reason it is so slow is due to the elaborate nature in which some of the tests are conducted.
+
+go-schemax is written to be extremely resilient in terms of operational stability. Many safeguards and balance-checks are performed at many junctures. This creates test coverage difficulties, meaning that certain error conditions simply cannot be triggered through ordinary means because the "higher layers" do a (really) good job at preventing such conditions. The result is an unflattering code coverage grade.
+
+Therefore, rather extraordinary measures are required to mitigate coverage issues, such as re-enveloping (or re-casting) instances to try and "trick" the underlying `stackage.Stack` type into accepting something undesirable. This, and many other bizarre procedures, can be observed in the `_codecov` test functions found throughout the various `*_test.go` files.
+
+Even worse, some of the `Example` functions perform **repeated imports of the ENTIRE SCHEMA LIBRARY** -- just for the benefit of certain examples. As such, a lot more is happening within these tests than a user would normally trigger under ordinary conditions. Understand this is intentional, and is meant to ensure that go-schemax remains quick and snappy regardless.
+
+As such, latency in tests run by this package probably won't be observed under ordinary (real-life) circumstances.
