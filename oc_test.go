@@ -153,7 +153,7 @@ the return [ObjectClasses] instance.
 func ExampleObjectClass_SubClasses() {
 	def := mySchema.ObjectClasses().Get(`top`)
 	fmt.Printf("%d subordinate classes found", def.SubClasses().Len())
-	// Output: 49 subordinate classes found
+	// Output: 60 subordinate classes found
 }
 
 /*
