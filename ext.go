@@ -116,7 +116,9 @@ func (r Extensions) Set(key string, values ...string) {
 		}
 	} else {
 		for i := 0; i < len(values); i++ {
-			_values.cast().Push(values[i])
+			if !_values.Contains(values[i]) {
+				_values.cast().Push(values[i])
+			}
 		}
 	}
 }
