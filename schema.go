@@ -31,6 +31,8 @@ func NewSchema(o ...Option) (r Schema) {
 		r.loadMatchingRules,
 		r.loadAttributeTypes,
 		r.loadObjectClasses,
+		r.loadNameForms,
+		r.loadDITStructureRules,
 	} {
 		if err = funk(); err != nil {
 			break
