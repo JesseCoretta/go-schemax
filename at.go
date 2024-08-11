@@ -390,16 +390,18 @@ func (r AttributeTypes) oIDsStringer(_ ...any) string {
 /*
 factory default stackage closure func for oid lists - do not exec directly.
 */
-func (r AttributeTypes) oIDsStringerStd(_ ...any) (present string) {
+func (r AttributeTypes) oIDsStringerStd(_ ...any) string {
 	var _present []string
 	for i := 0; i < r.len(); i++ {
 		_present = append(_present, r.index(i).OID())
 	}
 
+	present := newStringBuilder()
+
 	switch len(_present) {
 	case 0:
 	case 1:
-		present = _present[0]
+		present.WriteString(_present[0])
 	default:
 		padchar := string(rune(32))
 		if !r.cast().IsPadded() {
@@ -407,10 +409,10 @@ func (r AttributeTypes) oIDsStringerStd(_ ...any) (present string) {
 		}
 
 		joined := join(_present, padchar+`$`+padchar)
-		present = `(` + padchar + joined + padchar + `)`
+		present.WriteString(`(` + padchar + joined + padchar + `)`)
 	}
 
-	return
+	return present.String()
 }
 
 /*
@@ -434,38 +436,39 @@ like:
 
 	cn
 */
-func (r AttributeTypes) oIDsStringerPretty(lead int) (present string) {
+func (r AttributeTypes) oIDsStringerPretty(lead int) string {
 	L := r.Len()
 	switch L {
 	case 0:
-		return
+		return ``
 	case 1:
-		present = r.Index(0).OID()
-		return
+		return r.Index(0).OID()
 	}
 
+	present := newStringBuilder()
 	num := lead + 5
 	for idx := 0; idx < L; idx++ {
 		sl := r.Index(idx).OID()
 		if idx == 0 {
-			present += `( ` + sl + string(rune(10))
+			present.WriteString(`( ` + sl)
+			present.WriteRune(rune(10))
 			continue
 		}
 
 		for i := 0; i < num; i++ {
-			present += ` `
+			present.WriteRune(rune(32))
 		}
 
-		present += `$ ` + sl
+		present.WriteString(`$ ` + sl)
 		if idx == L-1 {
-			present += ` )`
+			present.WriteString(` )`)
 			break // no newline on last line
 		}
 
-		present += string(rune(10))
+		present.WriteRune(rune(10))
 	}
 
-	return
+	return present.String()
 }
 
 // stackage closure func - do not exec directly.
@@ -932,7 +935,7 @@ func (r *attributeType) setStringer(function ...Stringer) {
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
-				// Return a preserved value.
+				// Return a static value.
 				return str
 			}
 		}
@@ -1782,6 +1785,7 @@ func (r Schema) loadAttributeTypes() (err error) {
 			r.loadRFC4524AttributeTypes,
 			r.loadRFC4530AttributeTypes,
 			r.loadRFC2589AttributeTypes,
+			r.loadRFC4403AttributeTypes,
 			r.loadRFC5020AttributeTypes,
 		}
 
@@ -2155,6 +2159,32 @@ func (r Schema) loadRFC5020AttributeTypes() (err error) {
 	if want := rfc5020AttributeTypes.Len(); i != want {
 		if err == nil {
 			err = mkerr("Unexpected number of RFC5020 AttributeTypes parsed: want " +
+				itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC4403AttributeTypes returns an error following an attempt to
+load all RFC 4403 [AttributeType] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC4403AttributeTypes() error {
+	return r.loadRFC4403AttributeTypes()
+}
+
+func (r Schema) loadRFC4403AttributeTypes() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc4403AttributeTypes) && err == nil; i++ {
+		at := rfc4403AttributeTypes[i]
+		err = r.ParseAttributeType(string(at))
+	}
+
+	if want := rfc4403AttributeTypes.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC4403 AttributeTypes parsed: want " +
 				itoa(want) + ", got " + itoa(i))
 		}
 	}
