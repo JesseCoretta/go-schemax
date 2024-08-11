@@ -290,7 +290,7 @@ stack in which they reside.
 func ExampleNameForms_Maps() {
 	defs := mySchema.NameForms().Maps()
 	fmt.Println(defs[0][`NUMERICOID`][0]) // risky, just for simplicity
-	// Output: 1.3.6.1.4.1.56521.101.2.7.1
+	// Output: 1.3.6.1.1.10.15.1
 }
 
 /*

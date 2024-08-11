@@ -1015,3 +1015,51 @@ IsZero returns a Boolean value indicative of a nil receiver state.
 func (r NameForm) IsZero() bool {
 	return r.nameForm == nil
 }
+
+/*
+LoadNameForms returns an error following an attempt to load all
+built-in [NameForm] slices into the receiver instance.
+*/
+func (r Schema) LoadNameForms() error {
+	return r.loadNameForms()
+}
+
+func (r Schema) loadNameForms() (err error) {
+	if !r.IsZero() {
+		funks := []func() error{
+			r.loadRFC4403NameForms,
+		}
+
+		for i := 0; i < len(funks) && err == nil; i++ {
+			err = funks[i]()
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC4403NameForms returns an error following an attempt to
+load all RFC 4403 [NameForm] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC4403NameForms() error {
+	return r.loadRFC4403NameForms()
+}
+
+func (r Schema) loadRFC4403NameForms() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc4403NameForms) && err == nil; i++ {
+		at := rfc4403NameForms[i]
+		err = r.ParseNameForm(string(at))
+	}
+
+	if want := rfc4403NameForms.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC4403 NameForms parsed: want " +
+				itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
+}
