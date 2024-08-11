@@ -296,6 +296,42 @@ func ExampleMatchingRuleUse_SetStringer() {
 	//             $ roomNumber
 	//             $ uniqueIdentifier
 	//             $ userClass
+	//             $ uddiBusinessKey
+	//             $ uddiOperator
+	//             $ uddiName
+	//             $ uddiDescription
+	//             $ uddiDiscoveryURLs
+	//             $ uddiUseType
+	//             $ uddiPersonName
+	//             $ uddiPhone
+	//             $ uddiEMail
+	//             $ uddiSortCode
+	//             $ uddiTModelKey
+	//             $ uddiAddressLine
+	//             $ uddiIdentifierBag
+	//             $ uddiCategoryBag
+	//             $ uddiKeyedReference
+	//             $ uddiServiceKey
+	//             $ uddiBindingKey
+	//             $ uddiAccessPoint
+	//             $ uddiHostingRedirector
+	//             $ uddiInstanceDescription
+	//             $ uddiInstanceParms
+	//             $ uddiOverviewDescription
+	//             $ uddiOverviewURL
+	//             $ uddiFromKey
+	//             $ uddiToKey
+	//             $ uddiUUID
+	//             $ uddiLang
+	//             $ uddiv3BusinessKey
+	//             $ uddiv3ServiceKey
+	//             $ uddiv3BindingKey
+	//             $ uddiv3TModelKey
+	//             $ uddiv3NodeId
+	//             $ uddiv3SubscriptionKey
+	//             $ uddiv3SubscriptionFilter
+	//             $ uddiv3NotificationInterval
+	//             $ uddiv3EntityKey
 	//             $ aSN1Notation )
 	//     X-ORIGIN 'RFC4517' )
 	// Old: This useless message brought to you by a dumb stringer
@@ -477,6 +513,42 @@ func ExampleMatchingRuleUse_String() {
 	//             $ roomNumber
 	//             $ uniqueIdentifier
 	//             $ userClass
+	//             $ uddiBusinessKey
+	//             $ uddiOperator
+	//             $ uddiName
+	//             $ uddiDescription
+	//             $ uddiDiscoveryURLs
+	//             $ uddiUseType
+	//             $ uddiPersonName
+	//             $ uddiPhone
+	//             $ uddiEMail
+	//             $ uddiSortCode
+	//             $ uddiTModelKey
+	//             $ uddiAddressLine
+	//             $ uddiIdentifierBag
+	//             $ uddiCategoryBag
+	//             $ uddiKeyedReference
+	//             $ uddiServiceKey
+	//             $ uddiBindingKey
+	//             $ uddiAccessPoint
+	//             $ uddiHostingRedirector
+	//             $ uddiInstanceDescription
+	//             $ uddiInstanceParms
+	//             $ uddiOverviewDescription
+	//             $ uddiOverviewURL
+	//             $ uddiFromKey
+	//             $ uddiToKey
+	//             $ uddiUUID
+	//             $ uddiLang
+	//             $ uddiv3BusinessKey
+	//             $ uddiv3ServiceKey
+	//             $ uddiv3BindingKey
+	//             $ uddiv3TModelKey
+	//             $ uddiv3NodeId
+	//             $ uddiv3SubscriptionKey
+	//             $ uddiv3SubscriptionFilter
+	//             $ uddiv3NotificationInterval
+	//             $ uddiv3EntityKey
 	//             $ aSN1Notation )
 	//     X-ORIGIN 'RFC4517' )
 }
