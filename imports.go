@@ -13,6 +13,7 @@ import (
 	"github.com/JesseCoretta/go-schemax/internal/rfc3045"
 	"github.com/JesseCoretta/go-schemax/internal/rfc3671"
 	"github.com/JesseCoretta/go-schemax/internal/rfc3672"
+	"github.com/JesseCoretta/go-schemax/internal/rfc4403"
 	"github.com/JesseCoretta/go-schemax/internal/rfc4512"
 	"github.com/JesseCoretta/go-schemax/internal/rfc4517"
 	"github.com/JesseCoretta/go-schemax/internal/rfc4519"
@@ -22,7 +23,6 @@ import (
 	"github.com/JesseCoretta/go-schemax/internal/rfc5020"
 	"github.com/JesseCoretta/go-schemax/internal/x501"
 
-	"github.com/JesseCoretta/go-objectid"
 	"github.com/JesseCoretta/go-shifty"
 )
 
@@ -48,9 +48,9 @@ var (
 	isAlpha func(rune) bool = unicode.IsLetter
 )
 
-var (
-	parseDot func(...any) (*objectid.DotNotation, error) = objectid.NewDotNotation
-)
+func newStringBuilder() strings.Builder {
+	return strings.Builder{}
+}
 
 func newOpts() Options {
 	return Options(shifty.New(shifty.Uint16))
@@ -146,23 +146,26 @@ var (
 	x501AttributeTypes    x501.AttributeTypeDefinitions    = x501.AllAttributeTypes
 	rfc2079AttributeTypes rfc2079.AttributeTypeDefinitions = rfc2079.AllAttributeTypes
 	rfc2307AttributeTypes rfc2307.AttributeTypeDefinitions = rfc2307.AllAttributeTypes
+	rfc2589AttributeTypes rfc2589.AttributeTypeDefinitions = rfc2589.AllAttributeTypes
 	rfc2798AttributeTypes rfc2798.AttributeTypeDefinitions = rfc2798.AllAttributeTypes
 	rfc3045AttributeTypes rfc3045.AttributeTypeDefinitions = rfc3045.AllAttributeTypes
 	rfc3671AttributeTypes rfc3671.AttributeTypeDefinitions = rfc3671.AllAttributeTypes
 	rfc3672AttributeTypes rfc3672.AttributeTypeDefinitions = rfc3672.AllAttributeTypes
+	rfc4403AttributeTypes rfc4403.AttributeTypeDefinitions = rfc4403.AllAttributeTypes
 	rfc4512AttributeTypes rfc4512.AttributeTypeDefinitions = rfc4512.AllAttributeTypes
 	rfc4519AttributeTypes rfc4519.AttributeTypeDefinitions = rfc4519.AllAttributeTypes
 	rfc4523AttributeTypes rfc4523.AttributeTypeDefinitions = rfc4523.AllAttributeTypes
 	rfc4524AttributeTypes rfc4524.AttributeTypeDefinitions = rfc4524.AllAttributeTypes
 	rfc4530AttributeTypes rfc4530.AttributeTypeDefinitions = rfc4530.AllAttributeTypes
-	rfc2589AttributeTypes rfc2589.AttributeTypeDefinitions = rfc2589.AllAttributeTypes
 	rfc5020AttributeTypes rfc5020.AttributeTypeDefinitions = rfc5020.AllAttributeTypes
 
 	rfc2079ObjectClasses rfc2079.ObjectClassDefinitions = rfc2079.AllObjectClasses
 	rfc2307ObjectClasses rfc2307.ObjectClassDefinitions = rfc2307.AllObjectClasses
+	rfc2589ObjectClasses rfc2589.ObjectClassDefinitions = rfc2589.AllObjectClasses
 	rfc2798ObjectClasses rfc2798.ObjectClassDefinitions = rfc2798.AllObjectClasses
 	rfc3671ObjectClasses rfc3671.ObjectClassDefinitions = rfc3671.AllObjectClasses
 	rfc3672ObjectClasses rfc3672.ObjectClassDefinitions = rfc3672.AllObjectClasses
+	rfc4403ObjectClasses rfc4403.ObjectClassDefinitions = rfc4403.AllObjectClasses
 	rfc4512ObjectClasses rfc4512.ObjectClassDefinitions = rfc4512.AllObjectClasses
 	rfc4519ObjectClasses rfc4519.ObjectClassDefinitions = rfc4519.AllObjectClasses
 	rfc4523ObjectClasses rfc4523.ObjectClassDefinitions = rfc4523.AllObjectClasses
@@ -177,4 +180,8 @@ var (
 	rfc4517MatchingRules rfc4517.MatchingRuleDefinitions = rfc4517.AllMatchingRules
 	rfc4523MatchingRules rfc4523.MatchingRuleDefinitions = rfc4523.AllMatchingRules
 	rfc4530MatchingRules rfc4530.MatchingRuleDefinitions = rfc4530.AllMatchingRules
+
+	rfc4403NameForms rfc4403.NameFormDefinitions = rfc4403.AllNameForms
+
+	rfc4403DITStructureRules rfc4403.DITStructureRuleDefinitions = rfc4403.AllDITStructureRules
 )
