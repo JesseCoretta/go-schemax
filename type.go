@@ -82,8 +82,21 @@ const (
 	// reflected in all stacks in which the Definition resides.
 	AllowOverride
 
+	// AllowReindexedStructureRules allows the push process of
+	// dITStructureRule instances into a Schema to reindex, or
+	// renumber, the new rule if it conflicts with an existing
+	// rule. This option exists because dITStructureRules are
+	// especially prone to uniqueness violations due to their
+	// numbering system lacking the dynamics normally enjoyed
+	// through numeric OIDs.
+	//
+	// Note that it may be necessary to re-apply any custom
+	// stringers of a static nature that are assigned to any
+	// related dITStructureRules following a positive reindexing.
+	// This may include subordinate rules.
+	AllowReindexedStructureRules
+
 	// As-of-yet unused bit settings
-	//_                    //     8
 	//_                    //    16
 	//_                    //    32
 	//_                    //    64
@@ -137,7 +150,28 @@ type ValueQualifier func(any) error
 
 /*
 Stringer is an optional function or method signature which allows user
-controlled string representation per definition.
+controlled string representation per schema definition.
+
+The package-default stringer is static in nature, having relied upon
+[text/template] to generate a one-time string representation of the
+receiver instance for performance reasons. The string representation
+value is essentially embedded as a return value, used for every call
+of String.
+
+The drawback of this approach is that subsequent changes to one or
+more schema definitions instances after a string was generated will
+not be visible until the default stringer is reapplied by way of the
+SetStringer method being executed in niladic fashion. This results
+in a fresh call to the [text/template] system, producing the updated
+value.
+
+The SetStringer method can be executed not only on individual definitions,
+but on entire stacks as well. While convenient, the operation may be rather
+costly on particularly large stacks.
+
+To mitigate this drawback entirely, users may author custom stringers of
+their own design that are dynamic -- in that they compose a string value
+for every call of String -- as opposed to static.
 */
 type Stringer func() string
 
