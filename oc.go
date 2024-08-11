@@ -1233,54 +1233,56 @@ like:
 
 	top
 */
-func (r ObjectClasses) oIDsStringerPretty(lead int) (present string) {
+func (r ObjectClasses) oIDsStringerPretty(lead int) string {
 	L := r.Len()
 	switch L {
 	case 0:
-		return
+		return ``
 	case 1:
-		present = r.Index(0).OID()
-		return
+		return r.Index(0).OID()
 	}
 
+	present := newStringBuilder()
 	num := lead + 5
 	for idx := 0; idx < L; idx++ {
 		sl := r.Index(idx).OID()
 		if idx == 0 {
-			present += `( ` + sl + string(rune(10))
+			present.WriteString(`( ` + sl)
+			present.WriteRune(rune(10))
 			continue
 		}
 
 		for i := 0; i < num; i++ {
-			present += ` `
+			present.WriteRune(rune(32))
 		}
 
-		present += `$ ` + sl
+		present.WriteString(`$ ` + sl)
 		if idx == L-1 {
-			present += ` )`
+			present.WriteString(` )`)
 			break // no newline on last line
 		}
 
-		present += string(rune(10))
+		present.WriteRune(rune(10))
 	}
 
-	return
+	return present.String()
 }
 
 /*
 factory default stackage closure func for oid lists - do not exec directly.
 */
-func (r ObjectClasses) oIDsStringerStd(_ ...any) (present string) {
+func (r ObjectClasses) oIDsStringerStd(_ ...any) string {
 	var _present []string
 	for i := 0; i < r.len(); i++ {
 		_present = append(_present, r.index(i).OID())
 	}
 
+	present := newStringBuilder()
 	switch len(_present) {
 	case 0:
 		break
 	case 1:
-		present = _present[0]
+		present.WriteString(_present[0])
 	default:
 		padchar := string(rune(32))
 		if !r.cast().IsPadded() {
@@ -1288,10 +1290,10 @@ func (r ObjectClasses) oIDsStringerStd(_ ...any) (present string) {
 		}
 
 		joined := join(_present, padchar+`$`+padchar)
-		present = "(" + padchar + joined + padchar + ")"
+		present.WriteString("(" + padchar + joined + padchar + ")")
 	}
 
-	return
+	return present.String()
 }
 
 // stackage closure func - do not exec directly.
@@ -1451,9 +1453,11 @@ func (r Schema) loadObjectClasses() (err error) {
 			r.loadRFC4524ObjectClasses,
 			r.loadRFC2307ObjectClasses,
 			r.loadRFC2079ObjectClasses,
+			r.loadRFC2589ObjectClasses,
 			r.loadRFC2798ObjectClasses,
 			r.loadRFC3671ObjectClasses,
 			r.loadRFC3672ObjectClasses,
+			r.loadRFC4403ObjectClasses,
 		}
 
 		for i := 0; i < len(funks) && err == nil; i++ {
@@ -1690,6 +1694,56 @@ func (r Schema) loadRFC4524ObjectClasses() (err error) {
 	if want := rfc4524ObjectClasses.Len(); i != want {
 		if err == nil {
 			err = mkerr("Unexpected number of RFC4524 ObjectClasses parsed: want " + itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC2589ObjectClasses returns an error following an attempt to
+load all RFC 2589 [ObjectClass] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC2589ObjectClasses() error {
+	return r.loadRFC2589ObjectClasses()
+}
+
+func (r Schema) loadRFC2589ObjectClasses() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc2589ObjectClasses) && err == nil; i++ {
+		oc := rfc2589ObjectClasses[i]
+		err = r.ParseObjectClass(string(oc))
+	}
+
+	if want := rfc2589ObjectClasses.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC2589 ObjectClasses parsed: want " + itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC4403ObjectClasses returns an error following an attempt to
+load all RFC 4403 [ObjectClass] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC4403ObjectClasses() error {
+	return r.loadRFC4403ObjectClasses()
+}
+
+func (r Schema) loadRFC4403ObjectClasses() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc4403ObjectClasses) && err == nil; i++ {
+		oc := rfc4403ObjectClasses[i]
+		err = r.ParseObjectClass(string(oc))
+	}
+
+	if want := rfc4403ObjectClasses.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC4403 ObjectClasses parsed: want " + itoa(want) + ", got " + itoa(i))
 		}
 	}
 
