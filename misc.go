@@ -1,9 +1,9 @@
 package schemax
 
 /*
-IsNumericOID wraps [objectid.NewDotNotation] to parse input value id in
-order to assess its validity as an ASN.1 OBJECT IDENTIFIER in dot form,
-e.g.:
+IsNumericOID returns a Boolean value indicative of the outcome of an
+attempt to parse input value id in the context of an unencoded ASN.1
+OBJECT IDENTIFIER in dot form, e.g.:
 
 	1.3.6.1.4.1.56521.999
 
@@ -16,6 +16,8 @@ The qualifications are as follows:
   - Dots cannot be contiguous
   - Though arcs are unbounded, no arc may ever be negative
   - OID must consist of at least two (2) arcs
+
+Note: poached from JesseCoretta/go-objectid.
 */
 func IsNumericOID(id string) bool {
 	return isNumericOID(id)
