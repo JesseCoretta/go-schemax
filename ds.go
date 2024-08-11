@@ -824,13 +824,105 @@ func (r DITStructureRules) canPush(x ...any) (err error) {
 		return
 	}
 
-	for i := 0; i < len(x) && err == nil; i++ {
+	for i := 0; i < len(x); i++ {
 		instance := x[i]
-		if ds, ok := instance.(DITStructureRule); !ok || ds.IsZero() {
+		ds, ok := instance.(DITStructureRule)
+		if !ok || ds.IsZero() {
 			err = ErrTypeAssert
-		} else if tst := r.get(ds.RuleID()); !tst.IsZero() {
-			err = mkerr(ErrNotUnique.Error() + ": " + ds.Type() + `, ` + ds.NumericOID())
+			break
 		}
+
+		// Check whether a dSR exists bearing the same
+		// ruleid as the newly pushed candidate.
+		if tst := r.get(ds.RuleID()); !tst.IsZero() {
+			// If explicitly permitted by the schema config,
+			// we'll re-index any dSRs bearing a numerical
+			// ID that conflicts with a preexisting rule
+			// within the stack.
+			opts := ds.Schema().Options()
+			if !opts.Positive(AllowReindexedStructureRules) {
+				// Not allowed!
+				err = mkerr(ErrNotUnique.Error() + ": " + ds.Type() +
+					`, ` + uitoa(ds.RuleID()))
+				break
+			}
+
+			// Don't reindex if there is also a naming conflict.
+			if len(ds.Name()) > 0 && eq(tst.Name(), ds.Name()) {
+				err = mkerr("dITStructureRule name/id conflict; cannot reindex (" +
+					uitoa(ds.RuleID()) + ")")
+				break
+			}
+
+			var next uint
+			// Determine the next available ruleid
+			if next, ok = r.nextIndex(); !ok {
+				err = mkerr("reindex id overflow or uninitialized dITStructureRules")
+				break
+			}
+
+			// Overwrite the ruleid previously in conflict
+			ds.SetRuleID(next)
+
+			// Let the administrator know that a reindex has
+			// occurred.
+			ds.SetExtension(`X-WARNING`, `REINDEXED`)
+
+			// Update stringer (will clobber any CUSTOM)
+			// stringer
+			ds.setStringer()
+		}
+	}
+
+	return
+}
+
+/*
+nextIndex returns a uint alongside a Boolean value.
+
+If ok evaluates as true, the uint instance represents the next-available
+[DITStructureRule] ID that may be used in the event that re-indexing is
+to be conducted.
+
+If ok does not evaluate as true, this indicates an overflow would occur
+and 0 is returned as a result. If the receiver is uninitialized, a similar
+return ensues.
+
+The analysis does not look for breaks in otherwise contiguous sequences
+of numbers, rather it finds the highest number and checks whether an
+overflow would occur if 1 were added to that number. If no overflow is
+perceived, the new sum of the number is returned.
+*/
+func (r DITStructureRules) nextIndex() (idx uint, ok bool) {
+	if !r.IsZero() {
+		L := r.Len()
+		if L == 0 {
+			ok = true
+			return
+		}
+
+		var indices []uint
+		for i := 0; i < L; i++ {
+			indices = append(indices, r.Index(i).RuleID())
+		}
+
+		var slice uint
+		for i := 0; i < len(indices); i++ {
+			slice = indices[i]
+			for j := 0; j < len(indices); j++ {
+				if slice < indices[j] {
+					slice = indices[j]
+					continue
+				}
+			}
+		}
+
+		if !(slice+1 <= ^uint(0)) {
+			return
+		}
+
+		idx = slice + 1
+		ok = true
 	}
 
 	return
@@ -864,8 +956,8 @@ func (r DITStructureRules) IsZero() bool {
 
 /*
 Index returns the instance of [DITStructureRule] found within the
-receiver stack instance at index N.  If no instance is found at
-the index specified, a zero [DITStructureRule] instance is returned.
+receiver stack instance at index N. If no instance is found at the
+index specified, a zero [DITStructureRule] instance is returned.
 */
 func (r DITStructureRules) Index(idx int) DITStructureRule {
 	return r.index(idx)
@@ -897,6 +989,7 @@ func (r DITStructureRules) push(x any) (err error) {
 			break
 		}
 		r.cast().Push(tv)
+		err = r.cast().Err()
 	default:
 		err = ErrInvalidType
 	}
@@ -918,11 +1011,11 @@ func (r DITStructureRules) contains(id string) bool {
 }
 
 /*
-Get returns an instance of [DITStructureRule] based upon a search for id within
-the receiver stack instance.
+Get returns an instance of [DITStructureRule] based upon a search for id
+within the receiver stack instance.
 
-The return instance, if not nil, was retrieved based upon a textual match of
-the principal identifier of a [DITStructureRule] and the provided id.
+The return instance, if not nil, was retrieved based upon a textual match
+of the principal identifier of a [DITStructureRule] and the provided id.
 
 The return instance is nil if no match was made.
 
@@ -1058,4 +1151,52 @@ IsZero returns a Boolean value indicative of a nil receiver state.
 */
 func (r DITStructureRule) IsZero() bool {
 	return r.dITStructureRule == nil
+}
+
+/*
+LoadDITStructureRules returns an error following an attempt to load all
+built-in [DITStructureRule] slices into the receiver instance.
+*/
+func (r Schema) LoadDITStructureRules() error {
+	return r.loadDITStructureRules()
+}
+
+func (r Schema) loadDITStructureRules() (err error) {
+	if !r.IsZero() {
+		funks := []func() error{
+			r.loadRFC4403DITStructureRules,
+		}
+
+		for i := 0; i < len(funks) && err == nil; i++ {
+			err = funks[i]()
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC4403DITStructureRules returns an error following an attempt to
+load all RFC 4403 [DITStructureRule] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC4403DITStructureRules() error {
+	return r.loadRFC4403DITStructureRules()
+}
+
+func (r Schema) loadRFC4403DITStructureRules() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc4403DITStructureRules) && err == nil; i++ {
+		at := rfc4403DITStructureRules[i]
+		err = r.ParseDITStructureRule(string(at))
+	}
+
+	if want := rfc4403DITStructureRules.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC4403 DITStructureRules parsed: want " +
+				itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
 }
