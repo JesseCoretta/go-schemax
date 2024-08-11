@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	//"runtime/pprof"
 	"testing"
 
 	"github.com/JesseCoretta/go-antlr4512"
@@ -12,27 +13,32 @@ import (
 
 var mySchema Schema
 
+// For release testing only
+//func TestNewSchema(t *testing.T) {
+//        f, err := os.Create("cpu.prof")
+//        if err != nil {
+//            t.Fatal(err)
+//        }
+//        defer f.Close()
+//
+//        pprof.StartCPUProfile(f)
+//        defer pprof.StopCPUProfile()
+//
+//	mySchema := NewSchema()
+//	fmt.Printf("%d types parsed", mySchema.Counters().AT)
+//	// Output: 214 types parsed
+//}
+
 /*
 This example demonstrates the so-called "Quick Start Schema" initialization.
 The [NewSchema] function imports all built-in definitions instantly, allowing
 the user to start their activities with no fuss.
 */
-func ExampleNewSchema() {
-	mySchema := NewSchema()
-	fmt.Printf("%d types parsed", mySchema.Counters().AT)
-	// Output: 168 types parsed
-}
 
 func ExampleNewBasicSchema() {
 	mySchema := NewBasicSchema()
 	fmt.Printf("%d syntaxes parsed", mySchema.Counters().LS)
 	// Output: 67 syntaxes parsed
-}
-
-func ExampleNewEmptySchema() {
-	mySchema := NewEmptySchema()
-	fmt.Printf("%d syntaxes parsed", mySchema.Counters().LS)
-	// Output: 0 syntaxes parsed
 }
 
 func ExampleSchema_Options() {
@@ -103,7 +109,7 @@ which outlines the number of [Definition] instances in categorical fashion.
 */
 func ExampleSchema_Counters() {
 	fmt.Printf("%d types present", mySchema.Counters().AT)
-	// Output: 273 types present
+	// Output: 319 types present
 }
 
 /*
@@ -146,7 +152,7 @@ func TestLoadMatchingRules(t *testing.T) {
 }
 
 func TestLoadAttributeTypes(t *testing.T) {
-	want := 271 // includes supplementals and dcodSchema
+	want := 317 // includes supplementals and dcodSchema
 	if got := mySchema.AttributeTypes().Len(); got != want {
 		t.Errorf("%s failed: want '%d' attributeTypes, got '%d'",
 			t.Name(), want, got)
@@ -155,7 +161,7 @@ func TestLoadAttributeTypes(t *testing.T) {
 }
 
 func TestLoadObjectClasses(t *testing.T) {
-	want := 69
+	want := 80
 	if got := mySchema.ObjectClasses().Len(); got != want {
 		t.Errorf("%s failed: want '%d' objectClasses, got '%d'",
 			t.Name(), want, got)
@@ -477,7 +483,6 @@ func TestSchema_ParseFileAndDirectory(t *testing.T) {
 func TestLoads_codecov(t *testing.T) {
 	coolSchema := NewEmptySchema()
 	coolSchema.LoadRFC4517Syntaxes()
-	coolSchema.LoadRFC4517Syntaxes()
 	coolSchema.LoadRFC2307Syntaxes()
 	coolSchema.LoadRFC4523Syntaxes()
 	coolSchema.LoadRFC4530Syntaxes()
@@ -490,23 +495,28 @@ func TestLoads_codecov(t *testing.T) {
 	coolSchema.LoadX501AttributeTypes()
 	coolSchema.LoadRFC4512AttributeTypes()
 	coolSchema.LoadRFC2079AttributeTypes()
+	coolSchema.LoadRFC2589AttributeTypes()
 	coolSchema.LoadRFC2798AttributeTypes()
 	coolSchema.LoadRFC3045AttributeTypes()
 	coolSchema.LoadRFC3672AttributeTypes()
 	coolSchema.LoadRFC4519AttributeTypes()
 	coolSchema.LoadRFC2307AttributeTypes()
 	coolSchema.LoadRFC3671AttributeTypes()
+	coolSchema.LoadRFC4403AttributeTypes()
 	coolSchema.LoadRFC4523AttributeTypes()
 	coolSchema.LoadRFC4524AttributeTypes()
 	coolSchema.LoadRFC4530AttributeTypes()
+	coolSchema.LoadRFC5020AttributeTypes()
 
 	coolSchema.LoadRFC4512ObjectClasses()
 	coolSchema.LoadRFC2079ObjectClasses()
+	coolSchema.LoadRFC2589ObjectClasses()
 	coolSchema.LoadRFC2798ObjectClasses()
 	coolSchema.LoadRFC2307ObjectClasses()
 	coolSchema.LoadRFC4512ObjectClasses()
 	coolSchema.LoadRFC3671ObjectClasses()
 	coolSchema.LoadRFC3672ObjectClasses()
+	coolSchema.LoadRFC4403ObjectClasses()
 	coolSchema.LoadRFC4519ObjectClasses()
 	coolSchema.LoadRFC4523ObjectClasses()
 	coolSchema.LoadRFC4524ObjectClasses()
@@ -526,13 +536,16 @@ func init() {
 		SortExtensions,
 		SortLists,
 		HangingIndents,
+		AllowReindexedStructureRules,
 	)
 
 	funks := []func() error{
-		mySchema.LoadLDAPSyntaxes,   // import all built-in Syntaxes
-		mySchema.LoadMatchingRules,  // import all built-in Matching Rules
-		mySchema.LoadAttributeTypes, // import all built-in Attribute Types
-		mySchema.LoadObjectClasses,  // import all built-in Object Classes
+		mySchema.LoadLDAPSyntaxes,      // import all built-in Syntaxes
+		mySchema.LoadMatchingRules,     // import all built-in Matching Rules
+		mySchema.LoadAttributeTypes,    // import all built-in Attribute Types
+		mySchema.LoadObjectClasses,     // import all built-in Object Classes
+		mySchema.LoadNameForms,         // import all built-in Name Forms
+		mySchema.LoadDITStructureRules, // import all built-in DIT Structure Rules
 	}
 
 	var err error
@@ -550,7 +563,8 @@ func init() {
 	}
 
 	// load dcodSchema for more meaningful examples of certain
-	// lesser-used definition types.
+	// lesser-used definition types. This is not a built-in, as
+	// it is an unapproved I-D used here strictly for robust UTs.
 	if err := mySchema.ParseRaw(dcodSchema); err != nil {
 		panic(err)
 	}
