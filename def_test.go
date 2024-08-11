@@ -8,7 +8,7 @@ import (
 func ExampleDefinitionMaps_Len() {
 	classes := mySchema.ObjectClasses()
 	fmt.Printf("%d definitions", classes.Maps().Len())
-	// Output: 69 definitions
+	// Output: 80 definitions
 }
 
 func ExampleDefinitionMap_Len() {
