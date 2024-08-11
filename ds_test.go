@@ -132,9 +132,9 @@ Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleDITStructureRule_RuleID() {
-	def := mySchema.DITStructureRules().Get(`arcStructure`) // or 1, or "1"
+	def := mySchema.DITStructureRules().Get(`arcStructure`) // or 11, or "11"
 	fmt.Println(def.RuleID())
-	// Output: 1
+	// Output: 11
 }
 
 /*
@@ -163,7 +163,7 @@ in place of the fictional "mySchema" var shown here for simplicity.
 func ExampleDITStructureRule_Names() {
 	def := mySchema.DITStructureRules().Get(1) // or "1"
 	fmt.Println(def.Names())
-	// Output: 'arcStructure'
+	// Output: 'uddiBusinessEntityStructureRule'
 }
 
 /*
@@ -189,9 +189,9 @@ The [DITStructureRule.NumericOID] method only exists to satisfy Go's interface
 signature requirements with regards to the [Definition] interface type.
 */
 func ExampleDITStructureRule_SuperRules() {
-	def := mySchema.DITStructureRules().Get(2) // or 'dotNotArcStructure'
+	def := mySchema.DITStructureRules().Get(2)
 	fmt.Println(def.SuperRules())
-	// Output: 0
+	// Output: 1
 }
 
 /*
@@ -219,7 +219,7 @@ deals with unsigned rule IDs and names of definitions -- not indices.
 func ExampleDITStructureRules_Index() {
 	defs := mySchema.DITStructureRules()
 	fmt.Println(defs.Index(0).Name())
-	// Output: rootArcStructure
+	// Output: uddiBusinessEntityStructureRule
 }
 
 /*
@@ -377,7 +377,7 @@ func ExampleDITStructureRule_SetSuperRule() {
 	defs.SetRuleID(10)
 	defs.SetSuperRule(super)
 	fmt.Printf("Superior rule is %s", defs.SuperRules().Index(0).ID())
-	// Output: Superior rule is dotNotArcStructure
+	// Output: Superior rule is uddiContactStructureRule
 }
 
 /*
@@ -452,7 +452,7 @@ func ExampleDITStructureRules_Inventory() {
 	defs := mySchema.DITStructureRules()
 	inv := defs.Inventory()
 	fmt.Println(inv[`2`][0])
-	// Output: dotNotArcStructure
+	// Output: uddiContactStructureRule
 }
 
 /*
@@ -481,7 +481,7 @@ in place of the fictional "mySchema" var shown here for simplicity.
 func ExampleDITStructureRules_Maps() {
 	defs := mySchema.DITStructureRules().Maps()
 	fmt.Println(defs[2][`NAME`][0]) // risky, just for simplicity
-	// Output: dotNotArcStructure
+	// Output: uddiAddressStructureRule
 }
 
 /*
