@@ -13,7 +13,7 @@ enabled.
 func ExampleOptions_Positive() {
 	opts := mySchema.Options()
 	opts.Shift(AllowOverride) // FYR: AllowOverride is 8
-	fmt.Println(opts.Positive(16))
+	fmt.Println(opts.Positive(32))
 	// Output: false
 }
 
