@@ -551,6 +551,7 @@ func init() {
 	var err error
 	for i := 0; i < len(funks) && err == nil; i++ {
 		if err = funks[i](); err != nil {
+			fmt.Printf("I:%d\n", i)
 			panic(err)
 		}
 	}

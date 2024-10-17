@@ -170,6 +170,27 @@ func ExampleLDAPSyntax_Parse() {
 }
 
 /*
+This example demonstrates the process of parsing an extensible ldapSyntax
+definition into a proper instance of [LDAPSyntax].
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleLDAPSyntax_Parse_extensibleSyntax() {
+	var raw string = `( 1.3.6.1.4.1.56521.101.2.1.4 DESC 'X.680, cl 32.3: ObjectIdentifierValue' X-PATTERN '^\{([a-z](-?[A-Za-z0-9]+)*(\(\d+\))?)(\s([a-z](-?[A-Za-z0-9]+)*(\(\d+\))))*\}$' )`
+        var def LDAPSyntax = mySchema.NewLDAPSyntax()
+        if err := def.Parse(raw); err != nil {
+                fmt.Println(err)
+                return
+        }
+
+        fmt.Println(def.SetStringer())
+        // Output: ( 1.3.6.1.4.1.56521.101.2.1.4
+        //     DESC 'X.680, cl 32.3: ObjectIdentifierValue'
+        //     X-PATTERN '^\{([a-z](-?[A-Za-z0-9]+)*(\(\d+\))?)(\s([a-z](-?[A-Za-z0-9]+)*(\(\d+\))))*\}$' )
+}
+
+/*
 This example demonstrates the creation of a new [LDAPSyntax]
 instance for manual assembly in a fluent manner.
 
