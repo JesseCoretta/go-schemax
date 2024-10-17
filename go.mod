@@ -1,10 +1,9 @@
 module github.com/JesseCoretta/go-schemax
 
 require (
-	github.com/JesseCoretta/go-antlr4512 v1.0.8
-	github.com/JesseCoretta/go-objectid v1.0.4
+	github.com/JesseCoretta/go-antlr4512 v1.0.9
 	github.com/JesseCoretta/go-shifty v1.0.1
-	github.com/JesseCoretta/go-stackage v1.0.4
+	github.com/JesseCoretta/go-stackage v1.0.5-0.20240811060306-352afc3a15a7
 )
 
 require (
@@ -13,5 +12,3 @@ require (
 )
 
 go 1.22
-
-toolchain go1.21.0
