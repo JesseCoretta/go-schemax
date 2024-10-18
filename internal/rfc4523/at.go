@@ -8,7 +8,7 @@ func (r AttributeTypeDefinitions) Len() int {
 }
 
 var (
-	AllAttributeTypes	  AttributeTypeDefinitions
+	AllAttributeTypes AttributeTypeDefinitions
 )
 
 var (

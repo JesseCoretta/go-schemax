@@ -1,7 +1,7 @@
 package rfc2307
 
 type ObjectClassDefinitions []ObjectClassDefinition
-type ObjectClassDefinition  string
+type ObjectClassDefinition string
 
 func (r ObjectClassDefinitions) Len() int {
 	return len(r)

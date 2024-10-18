@@ -37,7 +37,7 @@ var (
 	Secretary,
 	UniqueIdentifier,
 	UserClass,
-	SingleLevelQuality   AttributeTypeDefinition
+	SingleLevelQuality AttributeTypeDefinition
 )
 
 func (r AttributeTypeDefinition) String() string {
