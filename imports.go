@@ -144,6 +144,7 @@ var (
 	rfc2307Macros map[string]string = rfc2307.Macros
 
 	x501AttributeTypes    x501.AttributeTypeDefinitions    = x501.AllAttributeTypes
+	x501NameForms         x501.NameFormDefinitions         = x501.AllNameForms
 	rfc2079AttributeTypes rfc2079.AttributeTypeDefinitions = rfc2079.AllAttributeTypes
 	rfc2307AttributeTypes rfc2307.AttributeTypeDefinitions = rfc2307.AllAttributeTypes
 	rfc2589AttributeTypes rfc2589.AttributeTypeDefinitions = rfc2589.AllAttributeTypes

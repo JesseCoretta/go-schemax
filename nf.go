@@ -1028,6 +1028,7 @@ func (r Schema) loadNameForms() (err error) {
 	if !r.IsZero() {
 		funks := []func() error{
 			r.loadRFC4403NameForms,
+			r.loadX501NameForms,
 		}
 
 		for i := 0; i < len(funks) && err == nil; i++ {
@@ -1057,6 +1058,34 @@ func (r Schema) loadRFC4403NameForms() (err error) {
 	if want := rfc4403NameForms.Len(); i != want {
 		if err == nil {
 			err = mkerr("Unexpected number of RFC4403 NameForms parsed: want " +
+				itoa(want) + ", got " + itoa(i))
+		}
+	}
+
+	return
+}
+
+/*
+LoadX501NameForm returns an error following an attempt to load all
+[ITU-T Rec. X.501] [NameForm] slices into the receiver instance.
+
+[ITU-T Rec. X.501]: https://www.itu.int/rec/T-REC-X.501
+*/
+func (r Schema) LoadX501NameForms() error {
+	return r.loadX501NameForms()
+}
+
+func (r Schema) loadX501NameForms() (err error) {
+
+	var i int
+	for i = 0; i < len(x501NameForms) && err == nil; i++ {
+		nf := x501NameForms[i]
+		err = r.ParseNameForm(string(nf))
+	}
+
+	if want := x501NameForms.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of X.501 NameForms parsed: want " +
 				itoa(want) + ", got " + itoa(i))
 		}
 	}
