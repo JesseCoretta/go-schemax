@@ -4,11 +4,11 @@ type NameFormDefinitions []NameFormDefinition
 type NameFormDefinition string
 
 func (r NameFormDefinitions) Len() int {
-        return len(r)
+	return len(r)
 }
 
 var AllNameForms NameFormDefinitions
-var  (
+var (
 	DomainNameForm,
 	DCOrgNameForm,
 	DCOrgUnitNameForm,
@@ -17,7 +17,7 @@ var  (
 )
 
 func (r NameFormDefinition) String() string {
-        return string(r)
+	return string(r)
 }
 
 func init() {
@@ -31,12 +31,12 @@ func init() {
 	DCLNameForm = NameFormDefinition(`( 1.3.6.1.1.2.4 NAME 'dcLocalityNameForm' OC locality MUST dc X-ORIGIN 'RFC2377' )`)
 	UIDOrgPersonNameForm = NameFormDefinition(`( 1.3.6.1.1.2.5 NAME 'uidOrganizationalPersonNameForm' OC organizationalPerson MUST uid X-ORIGIN 'RFC2377' )`)
 
-        AllNameForms = NameFormDefinitions{
+	AllNameForms = NameFormDefinitions{
 		DomainNameForm,
 		DCOrgNameForm,
 		DCOrgUnitNameForm,
 		DCLNameForm,
 		UIDOrgPersonNameForm,
-        }
+	}
 
 }
