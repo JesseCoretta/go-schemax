@@ -1027,12 +1027,39 @@ func (r Schema) LoadNameForms() error {
 func (r Schema) loadNameForms() (err error) {
 	if !r.IsZero() {
 		funks := []func() error{
+			r.loadRFC2377NameForms,
 			r.loadRFC4403NameForms,
 			r.loadX501NameForms,
 		}
 
 		for i := 0; i < len(funks) && err == nil; i++ {
 			err = funks[i]()
+		}
+	}
+
+	return
+}
+
+/*
+LoadRFC2377NameForms returns an error following an attempt to
+load all RFC 2377 [NameForm] slices into the receiver instance.
+*/
+func (r Schema) LoadRFC2377NameForms() error {
+	return r.loadRFC2377NameForms()
+}
+
+func (r Schema) loadRFC2377NameForms() (err error) {
+
+	var i int
+	for i = 0; i < len(rfc2377NameForms) && err == nil; i++ {
+		at := rfc2377NameForms[i]
+		err = r.ParseNameForm(string(at))
+	}
+
+	if want := rfc2377NameForms.Len(); i != want {
+		if err == nil {
+			err = mkerr("Unexpected number of RFC2377 NameForms parsed: want " +
+				itoa(want) + ", got " + itoa(i))
 		}
 	}
 

@@ -164,13 +164,15 @@ Fluency does not extend to methods that are interrogative in nature, in that the
 
 ## Built-In Definitions
 
-The following table describes the contents and coverage of the so-called "built-in" schema definitions, all of which are sourced from recognized RFCs only. These can be imported en masse by users, or in piece-meal fashion. At present, the library contains more than four hundred such definitions.
+The following table describes the contents and coverage of the so-called "built-in" schema definitions, all of which are sourced from recognized RFCs and ITU-T Recommendations only. These can be imported en masse by users, or in piece-meal fashion. At present, the library contains more than four hundred such definitions.
 
 Note that no `dITContentRule` definitions exist in any RFC at this time, thus none are available for import.
 
 | DOCUMENT | [LS](## "LDAP Syntaxes")  | [MR](## "Matching Rules")  | [AT](## "Attribute Types")  | [OC](## "Object Classes")  | [DC](## "DIT Content Rules")  | [NF](## "Name Forms")  | [DS](## "DIT Structure Rules")  |
 | -------- | :----: | :----: | :----: | :----: | :----: | :----: | :----:  |
+| [![ITU-T Rec. X.501](https://img.shields.io/badge/ITU--T-Rec%20X.501-red?cacheSeconds=500000)](https://www.itu.int/rec/T-REC-X.501)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ   |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |
 | [![RFC 2307](https://img.shields.io/badge/RFC-2307-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc2307)  |  ✅  |  ✅  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
+| [![RFC 2377](https://img.shields.io/badge/RFC-2377-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc2377)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |
 | [![RFC 2589](https://img.shields.io/badge/RFC-2589-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc2589)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 2798](https://img.shields.io/badge/RFC-2798-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc2798)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |
 | [![RFC 3045](https://img.shields.io/badge/RFC-3045-blue?cacheSeconds=500000)](https://datatracker.ietf.org/doc/html/rfc3045)  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ✅  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |  ⁿ/ₐ  |

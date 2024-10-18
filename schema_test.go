@@ -521,6 +521,11 @@ func TestLoads_codecov(t *testing.T) {
 	coolSchema.LoadRFC4523ObjectClasses()
 	coolSchema.LoadRFC4524ObjectClasses()
 
+	coolSchema.LoadRFC2377NameForms()
+	coolSchema.LoadRFC4403NameForms()
+
+	coolSchema.LoadRFC4403DITStructureRules()
+
 }
 
 // supplemental attributeTypes not sourced from an official doc, but

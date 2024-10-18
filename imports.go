@@ -8,6 +8,7 @@ import (
 
 	"github.com/JesseCoretta/go-schemax/internal/rfc2079"
 	"github.com/JesseCoretta/go-schemax/internal/rfc2307"
+	"github.com/JesseCoretta/go-schemax/internal/rfc2377"
 	"github.com/JesseCoretta/go-schemax/internal/rfc2589"
 	"github.com/JesseCoretta/go-schemax/internal/rfc2798"
 	"github.com/JesseCoretta/go-schemax/internal/rfc3045"
@@ -182,6 +183,7 @@ var (
 	rfc4523MatchingRules rfc4523.MatchingRuleDefinitions = rfc4523.AllMatchingRules
 	rfc4530MatchingRules rfc4530.MatchingRuleDefinitions = rfc4530.AllMatchingRules
 
+	rfc2377NameForms rfc2377.NameFormDefinitions = rfc2377.AllNameForms
 	rfc4403NameForms rfc4403.NameFormDefinitions = rfc4403.AllNameForms
 
 	rfc4403DITStructureRules rfc4403.DITStructureRuleDefinitions = rfc4403.AllDITStructureRules
