@@ -490,6 +490,7 @@ func (r MatchingRuleUse) Map() (def DefinitionMap) {
 	def[`OBSOLETE`] = []string{bool2str(r.Obsolete())}
 	def[`APPLIES`] = applies
 	def[`RAW`] = []string{r.String()}
+	def[`TYPE`] = []string{r.Type()}
 
 	// copy our extensions from receiver r
 	// into destination def.
