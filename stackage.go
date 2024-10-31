@@ -52,7 +52,7 @@ func newRuleIDList(name string) RuleIDList {
 			`stringer`: nil,
 		}).
 		SetCategory(`ruleids`).
-		SetDelimiter(`_null_`).
+		SetDelimiter(``).
 		Paren(true).
 		Mutex())
 }
