@@ -195,3 +195,164 @@ func condenseWHSP(b string) (a string) {
 	a = trimS(a) //once more
 	return
 }
+
+/*
+governedDistinguishedName contains the components of a distinguished
+name and the integer length of those components that are not distinct.
+
+For example, a root suffix of "dc=example,dc=com" has two (2) components,
+meaning its flattened integer length is one (1), as "dc=example" and
+"dc=com" are not separate and distinct.
+
+An easier, though less descriptive, explanation of the integer length
+is simply "the number of comma characters at the far right (root) of
+the DN which do NOT describe separate entries.  Again, the comma in the
+"dc=example,dc=com" suffix equals a length of one (1).
+*/
+type governedDistinguishedName struct {
+	components [][][]string
+	flat       int
+	length     int
+}
+
+func (r *governedDistinguishedName) isZero() bool {
+	if r != nil {
+		return len(r.components) == 0
+	}
+
+	return true
+}
+
+/*
+tokenizeDN will attempt to tokenize the input dn value.
+
+Through the act of tokenization, the following occurs:
+
+An LDAP distinguished name, such as "uid=jesse+gidNumber=5042,ou=People,dc=example,dc=com,
+
+... is returned as:
+
+	[][][]string{
+	  [][]string{
+	    []string{`uid`,`jesse`},
+	    []string{`gidNumber`,`5042`},
+	  },
+	  [][]string{
+	    []string{`ou`,`People`},
+	  },
+	  [][]string{
+	    []string{`dc`,`example`},
+	  },
+	  [][]string{
+	    []string{`dc`,`com`},
+	  },
+	}
+
+Please note that this function is NOT considered a true parser. If actual
+parsing of component attribute values within a given DN is either desired
+or required, consider use of a proper parser such as [go-ldap/v3's ParseDN]
+function.
+
+flat is an integer value that describes the flattened root suffix "length".
+For instance, given the root suffix of "dc=example,dc=com" -- which is a
+single entry and not two separate entries -- the input value should be the
+integer 1.
+
+[go-ldap/v3's ParseDN]: https://pkg.go.dev/github.com/go-ldap/ldap/v3#ParseDN
+*/
+func tokenizeDN(d string, flat ...int) (x *governedDistinguishedName) {
+	if len(d) == 0 {
+		return
+	}
+
+	x = &governedDistinguishedName{
+		components: make([][][]string, 0),
+	}
+
+	if len(flat) > 0 {
+		x.flat = flat[0]
+	}
+
+	rdns := splitUnescaped(d, `,`, `\`)
+	lr := len(rdns)
+
+	if lr == x.flat || x.flat < 0 {
+		// bogus depth
+		return
+	}
+
+	for i := 0; i < lr; i++ {
+		var atvs [][]string = make([][]string, 0)
+		srdns := splitUnescaped(rdns[i], `+`, `\`)
+		for j := 0; j < len(srdns); j++ {
+			if atv := split(srdns[j], `=`); len(atv) == 2 {
+				atvs = append(atvs, atv)
+			} else {
+				atvs = append(atvs, []string{})
+			}
+		}
+
+		x.components = append(x.components, atvs)
+	}
+
+	if x.flat > 0 {
+		e := lr - 1
+		f := e - x.flat
+		x.components[f] = append(x.components[f], x.components[e]...)
+		x.components = x.components[:e]
+	}
+	x.length = len(x.components)
+
+	return
+}
+
+func detokenizeDN(x *governedDistinguishedName) (dtkz string) {
+	if x.isZero() {
+		return
+	}
+
+	var rdns []string
+	for i := 0; i < x.length; i++ {
+		rdn := x.components[i]
+		char := `,`
+		if i < x.length-x.flat && len(rdn) > 1 {
+			char = `+`
+		}
+
+		//var r []string
+		var atv []string
+		for j := 0; j < len(rdn); j++ {
+			atv = append(atv, rdn[j][0]+`=`+rdn[j][1])
+		}
+		rdns = append(rdns, join(atv, char))
+	}
+
+	dtkz = join(rdns, `,`)
+	return
+}
+
+func splitUnescaped(str, sep, esc string) (slice []string) {
+	slice = split(str, sep)
+	for i := len(slice) - 2; i >= 0; i-- {
+		if hasSfx(slice[i], esc) {
+			slice[i] = slice[i][:len(slice[i])-len(esc)] + sep + slice[i+1]
+			slice = append(slice[:i+1], slice[i+2:]...)
+		}
+	}
+
+	return
+}
+
+/*
+strInSlice returns a Boolean value indicative of whether the
+specified string (str) is present within slice. Please note
+that case is a significant element in the matching process.
+*/
+func strInSlice(str string, slice []string) bool {
+	for i := 0; i < len(slice); i++ {
+		if str == slice[i] {
+			return true
+		}
+	}
+	return false
+}

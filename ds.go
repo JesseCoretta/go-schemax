@@ -1,5 +1,11 @@
 package schemax
 
+//import "fmt"
+
+/*
+ds.go contains all DIT structure rule related methods and functions.
+*/
+
 /*
 NewDITStructureRules initializes a new [DITStructureRules] instance.
 */
@@ -598,8 +604,12 @@ func (r *dITStructureRule) setRuleID(x any) {
 }
 
 /*
-SetSuperRule assigns the provided input [DITStructureRule] instance(s) to the
-receiver's SUP clause.
+SetSuperRule assigns the provided input [DITStructureRule] instance(s)
+to the receiver's SUP clause.
+
+If the input arguments contain the `self` special keyword, the receiver
+instance will be added to the underlying instance of [DITStructureRules].
+This is meant to allow recursive (self-referencing) rules.
 
 This is a fluent method.
 */
@@ -612,16 +622,22 @@ func (r DITStructureRule) SetSuperRule(m ...any) DITStructureRule {
 }
 
 func (r *dITStructureRule) setSuperRule(m ...any) {
-	var err error
-	for i := 0; i < len(m) && err == nil; i++ {
+	for i := 0; i < len(m); i++ {
 		var def DITStructureRule
 		switch tv := m[i].(type) {
-		case string:
+		case uint64, uint, int:
 			def = r.schema.DITStructureRules().get(tv)
+		case string:
+			if lc(tv) == `self` {
+				// handle recursive reference
+				def = DITStructureRule{r}
+			} else {
+				def = r.schema.DITStructureRules().get(tv)
+			}
 		case DITStructureRule:
 			def = tv
 		default:
-			err = ErrInvalidType
+			continue
 		}
 
 		r.SuperRules.Push(def)
@@ -774,6 +790,124 @@ func (r DITStructureRule) String() (dsr string) {
 }
 
 /*
+Govern returns an error following an analysis of the input dn string
+value.
+
+The analysis of the DN will verify whether the RDN component complies
+with the receiver instance.
+
+If the receiver instance is subordinate to a superior structure rule,
+the parent RDN -- if present in the DN -- shall be similarly analyzed.
+The process continues throughout the entire structure rule "chain".  A
+DN must comply with ALL rules in a particular chain in order to "pass".
+
+The flat integer value describes the number of commas (starting from
+the far right) to IGNORE during the delimitation process.  This allows
+for so-called "flattened root suffix" values, e.g.: "dc=example,dc=com",
+to be identified, thus avoiding WRONGFUL delimitation to "dc=example"
+AND "dc=com" as separate and distinct entries.
+
+Please note this is a mock model of the analyses which compatible
+directory products shall execute. Naturally, there is no database (DIT)
+thus it is only a measure of the full breadth of structure rule checks.
+*/
+func (r DITStructureRule) Govern(dn string, flat ...int) (err error) {
+	if r.IsZero() {
+		err = ErrNilReceiver
+		return
+	}
+
+	gdn := tokenizeDN(dn, flat...)
+	if gdn.isZero() {
+		err = ErrInvalidDNOrFlatInt
+		return
+	}
+
+	rdn := gdn.components[0]
+
+	var mok int
+	var moks []string
+
+	// gather name form components
+	must := r.Form().Must()
+	may := r.Form().May()
+	noc := r.Form().OC() // named object class
+
+	// Iterate each ATV within the RDN.
+	for i := 0; i < len(rdn); i++ {
+		atv := rdn[i]
+		at := atv[0] // attribute type
+
+		if sch := r.Schema(); !sch.IsZero() {
+			// every attribute type must be
+			// present within the underlying
+			// schema (when non-zero) ...
+			if !sch.AttributeTypes().Contains(at) {
+				err = ErrAttributeTypeNotFound
+				return
+			}
+		}
+
+		// Make sure the named object class (i.e.: the
+		// STRUCTURAL class present in the receiver's
+		// name form "OC" clause) facilitates the type
+		// in some way.
+		if !(noc.Must().Contains(at) || noc.May().Contains(at)) {
+			err = ErrNamingViolationBadClassAttr
+			return
+		}
+
+		if must.Contains(at) {
+			if !strInSlice(at, moks) {
+				mok++
+				moks = append(moks, at)
+			}
+		} else if !may.Contains(at) {
+			err = ErrNamingViolationUnsanctioned
+			return
+		}
+	}
+
+	// NO required RDN types were satisfied.
+	if mok == 0 {
+		err = ErrNamingViolationMissingMust
+		return
+	}
+
+	// If there are no errors AND there are super rules,
+	// try to find the right rule chain to follow.
+	err = r.governRecurse(gdn, flat...)
+
+	return
+}
+
+func (r DITStructureRule) governRecurse(gdn *governedDistinguishedName, flat ...int) (err error) {
+	sr := r.SuperRules()
+
+	if len(gdn.components) > 1 && sr.Len() > 0 {
+		for i := 0; i < sr.Len(); i++ {
+			pdn := &governedDistinguishedName{
+				components: gdn.components[1:],
+				flat:       gdn.flat,
+				length:     gdn.length - 1,
+			}
+
+			// Recurse parent DN
+			if err = sr.Index(i).Govern(detokenizeDN(pdn), flat...); err != nil {
+				if sr.Len() == i+1 {
+					break // we failed, and there are no more rules.
+				}
+				// we failed, BUT there are more rules to try; continue.
+			} else {
+				break // we passed! stop processing.
+			}
+		}
+	}
+
+	return
+}
+
+/*
 Inventory returns an instance of [Inventory] which represents the current
 inventory of [DITStructureRule] instances within the receiver.
 
@@ -811,7 +945,7 @@ func (r DITStructureRules) iDsStringer(_ ...any) (present string) {
 			padchar = ``
 		}
 
-		joined := join(_present, padchar+` `+padchar)
+		joined := join(_present, padchar)
 		present = `(` + padchar + joined + padchar + `)`
 	}
 

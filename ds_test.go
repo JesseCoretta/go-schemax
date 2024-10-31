@@ -5,6 +5,22 @@ import (
 	"testing"
 )
 
+func ExampleDITStructureRule_Govern() {
+	dn := `dc=example,dc=com` // flattened context (1 comma)
+
+	// create a new DIT structure rule to leverage
+	// RFC 2377's 'domainNameForm' definition
+	dcdsr := mySchema.NewDITStructureRule().
+		SetRuleID(13).
+		SetName(`domainStructureRule`).
+		SetForm(mySchema.NameForms().Get(`domainNameForm`)).
+		SetStringer()
+
+	err := dcdsr.Govern(dn, 1) // flat int
+	fmt.Println(err)
+	// Output: <nil>
+}
+
 /*
 This example demonstrates the creation of a [DITStructureRule].
 */
@@ -505,6 +521,66 @@ func ExampleDITStructureRule_Parse_bogus() {
 	// Output: Inconsistent antlr4512.DITStructureRule parse results or bad content
 }
 
+func TestDITStructureRule_Govern(t *testing.T) {
+	// create a new DIT structure rule to leverage
+	// RFC 2377's 'domainNameForm' definition
+	dcdsr := mySchema.NewDITStructureRule().
+		SetRuleID(13).
+		SetName(`domainStructureRule`).
+		SetForm(mySchema.NameForms().Get(`domainNameForm`)).
+		SetStringer()
+	mySchema.DITStructureRules().Push(dcdsr)
+
+	ounf := mySchema.NewNameForm().
+		SetNumericOID(`1.3.6.1.4.1.56521.999.55.11.33`).
+		SetName(`ouNameForm`).
+		SetOC(`organizationalUnit`).
+		SetMust(`ou`).
+		SetStringer()
+	mySchema.NameForms().Push(ounf)
+
+	oudsr := mySchema.NewDITStructureRule().
+		SetRuleID(14).
+		SetName(`ouStructureRule`).
+		SetForm(mySchema.NameForms().Get(`ouNameForm`)).
+		SetSuperRule(13, `self`).
+		SetStringer()
+
+	mySchema.DITStructureRules().Push(oudsr)
+
+	for idx, strukt := range []struct {
+		DN string
+		L  int
+		ID int
+	}{
+		{`dc=example,dc=com`, 1, 13},
+		{`o=example`, 1, 13},
+		{`ou=People,dc=example,dc=com`, 1, 14},
+		{`ou=People,dc=example,dc=com`, -1, 13},
+		{`ou=Employees,ou=People,dc=example,dc=com`, 1, 14},
+		{`x=People,dc=example,dc=com`, 1, 14},
+		{`ou=People+ou=Employees,dc=example,dc=com`, 1, 14},
+		{`ou=People+cn=Employees,dc=example,dc=com`, 1, 14},
+		{`ou=People+ou=Employees,dc=example,dc=com`, 1, 14},
+		{`ou=Employees,ou=People,dc=example,dc=com`, 1, 13},
+	} {
+		rule := mySchema.DITStructureRules().Get(strukt.ID)
+		even := idx%2 == 0
+
+		if err := rule.Govern(strukt.DN, strukt.L); err != nil {
+			if even {
+				t.Errorf("%s[%d] failed: %v (%v)", t.Name(), idx, strukt.DN, err)
+				return
+			}
+		} else {
+			if !even {
+				t.Errorf("%s[%d] failed: expected error, got nothing", t.Name(), idx)
+				return
+			}
+		}
+	}
+}
+
 /*
 Do stupid things to make schemax panic, gain additional
 coverage in the process.
@@ -528,6 +604,7 @@ func TestDITStructureRule_codecov(t *testing.T) {
 	r.RuleID()
 	r.setOID(``)
 	r.macro()
+	r.Govern(`bogusdn`)
 	r.Parse(`crap`)
 	r.IsIdentifiedAs(`nothing`)
 	r.Replace(DITStructureRule{&dITStructureRule{}})
