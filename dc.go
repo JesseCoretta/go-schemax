@@ -445,6 +445,8 @@ func (r DITContentRules) Compliant() bool {
 /*
 StructuralClass returns the STRUCTURAL [ObjectClass] set within the
 receiver instance, or a zero instance if unset.
+
+This method is essentially the inverse of [ObjectClass.EnforcedBy].
 */
 func (r DITContentRule) StructuralClass() (soc ObjectClass) {
 	if !r.IsZero() {

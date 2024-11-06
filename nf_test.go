@@ -347,6 +347,7 @@ func TestNameForm_codecov(t *testing.T) {
 	_ = def.Name()
 	_ = def.Names()
 	_ = def.Extensions()
+	_ = def.EnforcedBy()
 	_ = def.Must()
 	_ = def.May()
 	_ = def.Schema()
@@ -395,6 +396,8 @@ func TestNameForm_codecov(t *testing.T) {
 		t.Errorf("%s failed: expected success, got %v", t.Name(), err)
 		return
 	}
+	def.EnforcedBy()
+
 	_ = def.macro()
 	def.setOID(`2.5.13.2`)
 

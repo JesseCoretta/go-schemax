@@ -1479,11 +1479,7 @@ func (r AttributeType) SetNoUserModification(x any) AttributeType {
 }
 
 /*
-SetObsolete assigns the input value to the underlying OBSOLETE clause within
-the receiver.
-
-Input types may be bool, or string representations of bool. When strings
-are used, case is not significant.
+SetObsolete sets the receiver's obsolescence state to true.
 
 Obsolescence cannot be unset.
 
@@ -1491,10 +1487,16 @@ This is a fluent method.
 */
 func (r AttributeType) SetObsolete(x any) AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setBoolean(`obs`, x)
+		r.attributeType.setObsolete()
 	}
 
 	return r
+}
+
+func (r *attributeType) setObsolete() {
+	if !r.Obsolete {
+		r.Obsolete = true
+	}
 }
 
 func (r *attributeType) setBoolean(t string, x any) {

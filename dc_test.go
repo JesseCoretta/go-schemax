@@ -353,6 +353,7 @@ func TestDITContentRule_codecov(t *testing.T) {
 		t.Errorf("%s failed: expected success, got %v", t.Name(), err)
 		return
 	}
+	def.StructuralClass().EnforcedBy()
 	_ = def.macro()
 	def.setOID(`2.5.6.2`)
 

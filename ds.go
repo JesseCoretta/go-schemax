@@ -97,6 +97,20 @@ func (r *dITStructureRule) replace(x DITStructureRule) {
 }
 
 /*
+NamedObjectClass returns the "namedObjectClass" of the receiver instance.
+
+The "namedObjectClass" describes the STRUCTURAL [ObjectClass] specified
+in the receiver's [NameForm] instance, and is described in [ITU-T Rec.
+X.501 clause 13.7.5].
+
+[ITU-T Rec. X.501 clause 13.7.5]: https://www.itu.int/rec/T-REC-X.501
+*/
+func (r DITStructureRule) NamedObjectClass() (noc ObjectClass) {
+	noc = r.Form().OC()
+	return
+}
+
+/*
 SetData assigns x to the receiver instance. This is a general-use method and has no
 specific intent beyond convenience. The contents may be subsequently accessed via the
 [DITStructureRule.Data] method.

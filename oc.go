@@ -147,6 +147,28 @@ func (r ObjectClass) macro() (m []string) {
 }
 
 /*
+EnforcedBy returns the [DITContentRule] instance which bears the same
+numeric OID held by the receiver instance, which must be a STRUCTURAL
+[ObjectClass].
+
+This method is essentially the inverse of [DITContentRule.StructuralClass].
+
+A schema can only contain one (1) such [DITContentRule] per STRUCTURAL
+[ObjectClass].
+
+If the return instance is zero, this means that either the receiver is
+not a STRUCTURAL [ObjectClass], or that no [DITContentRule] bearing the
+receiver's numeric OID is currently in force.
+*/
+func (r ObjectClass) EnforcedBy() (dcr DITContentRule) {
+	if !r.Schema().IsZero() && r.Kind() == StructuralKind {
+		dcr = r.Schema().DITContentRules().Get(r.NumericOID())
+	}
+
+	return
+}
+
+/*
 SetName assigns the provided names to the receiver instance.
 
 Name instances must conform to RFC 4512 descriptor format but

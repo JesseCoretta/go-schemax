@@ -190,6 +190,27 @@ func (r *nameForm) replace(x NameForm) {
 }
 
 /*
+EnforcedBy returns an instance of [DITStructureRules] containing all
+[DITStructureRule] instances which enforce the receiver instance.  A
+return value with an integer length of zero (0) indicates that there
+are no [DITStructureRule] instances which bear the receiver instance
+through the 'FORM' clause at present.
+*/
+func (r NameForm) EnforcedBy() (dsr DITStructureRules) {
+	if !r.Schema().IsZero() {
+		dsr = NewDITStructureRules()
+		rules := r.Schema().DITStructureRules()
+		for i := 0; i < rules.Len(); i++ {
+			if ds := rules.Index(i); ds.Form().IsIdentifiedAs(r.OID()) {
+				dsr.Push(ds)
+			}
+		}
+	}
+
+	return
+}
+
+/*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
 either the numericOID or descriptor of the receiver instance.  Case is
 not significant in the matching process.

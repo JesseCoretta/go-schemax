@@ -5,6 +5,13 @@ import (
 	"testing"
 )
 
+/*
+This example demonstrates an analysis of a distinguished name to determine
+whether it honors the receiver instance of [DITStructureRule].
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
 func ExampleDITStructureRule_Govern() {
 	dn := `dc=example,dc=com` // flattened context (1 comma)
 
@@ -23,6 +30,9 @@ func ExampleDITStructureRule_Govern() {
 
 /*
 This example demonstrates the creation of a [DITStructureRule].
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleNewDITStructureRule() {
 	// First create a name form that requires an
@@ -51,6 +61,21 @@ func ExampleNewDITStructureRule() {
 	//     NAME 'fictionalPersonStructure'
 	//     DESC 'person structure rule'
 	//     FORM fictionalPersonForm )
+}
+
+/*
+This example demonstrates the means of accessing the STRUCTURAL [ObjectClass]
+instance held by the [NameForm] instance assigned to the [DITStructureRule]
+instance.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleDITStructureRule_NamedObjectClass() {
+	ds := mySchema.DITStructureRules().Get(1) // Integer Identifier #1
+	noc := ds.NamedObjectClass()
+	fmt.Println(noc.OID())
+	// Output: uddiBusinessEntity
 }
 
 /*

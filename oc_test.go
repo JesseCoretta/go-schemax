@@ -440,6 +440,7 @@ func TestObjectClass_codecov(t *testing.T) {
 	bmr.cast().Push(NewObjectClass().SetSchema(mySchema))
 	bmr.cast().Push(NewObjectClass().SetSchema(mySchema).SetNumericOID(`1.2.3.4.5`))
 	var bad ObjectClass
+	bad.EnforcedBy()
 	bmr.cast().Push(bad)
 
 	ObjectClasses(bmr.cast()).oIDsStringerPretty(0)
@@ -530,6 +531,7 @@ func TestObjectClass_codecov(t *testing.T) {
 	def.SetMust(rune(11))
 	def.SetMay(mySchema.AttributeTypes().Get(`cn`))
 	def.SetMay(rune(11))
+	def.EnforcedBy()
 	def.SetSuperClass(mySchema.ObjectClasses().Get(`top`))
 	def.SetSuperClass(rune(11))
 	def.SetSuperClass(ObjectClass{})
