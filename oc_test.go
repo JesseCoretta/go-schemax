@@ -102,6 +102,20 @@ func ExampleObjectClasses_SetStringer() {
 }
 
 /*
+This example demonstrates the means for accessing all [ObjectClass]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleObjectClasses_XOrigin() {
+	defs := mySchema.ObjectClasses()
+	matches := defs.XOrigin(`RFC4512`)
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 4 of 80 objectClasses
+}
+
+/*
 This example demonstrates the assignment of arbitrary data to an instance
 of [ObjectClass].
 

@@ -53,6 +53,20 @@ func ExampleNameForms_Compliant() {
 	// Output: true
 }
 
+/*
+This example demonstrates the means for accessing all [NameForm]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleNameForms_XOrigin() {
+	defs := mySchema.NameForms()
+	matches := defs.XOrigin(`RFC4403`)
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 10 of 20 nameForms
+}
+
 func ExampleNameForm_IsIdentifiedAs() {
 	nf := mySchema.NameForms().Get(`nRootArcForm`)
 	fmt.Println(nf.IsIdentifiedAs(`1.3.6.1.4.1.56521.101.2.7.1`))

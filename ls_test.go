@@ -134,6 +134,20 @@ func ExampleLDAPSyntaxes_Maps() {
 }
 
 /*
+This example demonstrates the means for accessing all [LDAPSyntax]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleLDAPSyntaxes_XOrigin() {
+	defs := mySchema.LDAPSyntaxes()
+	matches := defs.XOrigin(`RFC4517`) // "RFC 4517" also matches.
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 53 of 67 ldapSyntaxes
+}
+
+/*
 This example demonstrates the [LDAPSyntaxes.Inventory] method, which
 produces an instance of [Inventory]. The [Inventory] type is used for
 accessing an OID to DESC "mapping table".

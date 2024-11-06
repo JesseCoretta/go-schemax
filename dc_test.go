@@ -98,6 +98,20 @@ func ExampleDITContentRules_SetStringer() {
 }
 
 /*
+This example demonstrates the means for accessing all [DITContentRule]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleDITContentRules_XOrigin() {
+	defs := mySchema.DITContentRules()
+	matches := defs.XOrigin(`RFC4512`) // no content rules in RFC 4512
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 0 of 1 dITContentRules
+}
+
+/*
 This example demonstrates the assignment of arbitrary data to an instance
 of [ObjectClass].
 

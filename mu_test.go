@@ -138,6 +138,20 @@ and reference index zero (0) of its `SYNTAX` key to obtain the relevant
 //}
 
 /*
+This example demonstrates the means for accessing all [MatchingRuleUse]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleMatchingRuleUses_XOrigin() {
+	defs := mySchema.MatchingRuleUses()
+	matches := defs.XOrigin(`Bogus RFC`)
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 0 of 32 matchingRuleUses
+}
+
+/*
 This example demonstrates use of the [MatchingRuleUses.Type] method to determine
 the type of stack defined within the receiver. This is mainly useful in cases
 where multiple stacks are being iterated in [Definitions] interface contexts

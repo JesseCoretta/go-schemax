@@ -255,6 +255,20 @@ func ExampleMatchingRules_Compliant() {
 }
 
 /*
+This example demonstrates the means for accessing all [MatchingRule]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleMatchingRules_XOrigin() {
+	defs := mySchema.MatchingRules()
+	matches := defs.XOrigin(`RFC4517`) // "RFC 4517" also matches.
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 32 of 44 matchingRules
+}
+
+/*
 This example demonstrates the means of accessing an arbitrary instance
 of any type that has been stored within an instance of [MatchingRule];
 this could include documentation or image data, to offer some examples.

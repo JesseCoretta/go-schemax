@@ -66,6 +66,20 @@ func ExampleAttributeTypes_Compliant() {
 }
 
 /*
+This example demonstrates the means for accessing all [AttributeType]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleAttributeTypes_XOrigin() {
+	defs := mySchema.AttributeTypes()
+	matches := defs.XOrigin(`RFC4512`)
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 24 of 318 attributeTypes
+}
+
+/*
 This example demonstrates determining the USAGE of an [AttributeType].
 
 Note: this example assumes a legitimate schema variable is defined

@@ -490,6 +490,25 @@ func (r *dITStructureRule) setStringer(function ...Stringer) {
 }
 
 /*
+XOrigin returns an instance of [DITStructureRules] containing only definitions
+which bear the X-ORIGIN value of x. Case is not significant in the matching
+process, nor is whitespace (e.g.: RFC 4517 vs. RFC4517).
+*/
+func (r DITStructureRules) XOrigin(x string) (defs DITStructureRules) {
+	defs = NewDITStructureRules()
+	for i := 0; i < r.Len(); i++ {
+		def := r.Index(i)
+		if xo, found := def.Extensions().Get(`X-ORIGIN`); found {
+			if xo.Contains(x) {
+				defs.push(def)
+			}
+		}
+	}
+
+	return
+}
+
+/*
 SetName assigns the provided names to the receiver instance.
 
 Name instances must conform to RFC 4512 descriptor format but

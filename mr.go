@@ -910,6 +910,25 @@ func (r *matchingRule) setStringer(function ...Stringer) {
 }
 
 /*
+XOrigin returns an instance of [MatchingRules] containing only definitions
+which bear the X-ORIGIN value of x. Case is not significant in the matching
+process, nor is whitespace (e.g.: RFC 4517 vs. RFC4517).
+*/
+func (r MatchingRules) XOrigin(x string) (defs MatchingRules) {
+	defs = NewMatchingRules()
+	for i := 0; i < r.Len(); i++ {
+		def := r.Index(i)
+		if xo, found := def.Extensions().Get(`X-ORIGIN`); found {
+			if xo.Contains(x) {
+				defs.push(def)
+			}
+		}
+	}
+
+	return
+}
+
+/*
 String is a stringer method that returns the string representation of
 the receiver instance.  A zero-value indicates an invalid receiver, or
 that the [ObjectClass.SetStringer] method was not used during MANUAL

@@ -111,6 +111,20 @@ func ExampleDITStructureRules_Compliant() {
 }
 
 /*
+This example demonstrates the means for accessing all [DITStructureRules]
+instances which bear the specified `X-ORIGIN` extension value.
+
+Note: this example assumes a legitimate schema variable is defined
+in place of the fictional "mySchema" var shown here for simplicity.
+*/
+func ExampleDITStructureRules_XOrigin() {
+	defs := mySchema.DITStructureRules()
+	matches := defs.XOrigin(`RFC4403`)
+	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
+	// Output: Matched 10 of 15 dITStructureRules
+}
+
+/*
 This example demonstrates accessing the string type name of a [DITStructureRule]
 definition.  This is mainly used as a low-cost alternative to type assertion
 when dealing with [Definition] interface type instances.

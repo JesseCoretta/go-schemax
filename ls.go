@@ -240,27 +240,23 @@ func (r *lDAPSyntax) setStringer(function ...Stringer) {
 }
 
 /*
-NOT YET IMPLEMENTED
-
-xOrigin returns an instance of LDAPSyntaxes containing only definitions
+XOrigin returns an instance of [LDAPSyntaxes] containing only definitions
 which bear the X-ORIGIN value of x. Case is not significant in the matching
 process, nor is whitespace (e.g.: RFC 4517 vs. RFC4517).
 */
-/*
-func (r LDAPSyntaxes) xOrigin(x string) (lss LDAPSyntaxes) {
-	lss = NewLDAPSyntaxes()
+func (r LDAPSyntaxes) XOrigin(x string) (defs LDAPSyntaxes) {
+	defs = NewLDAPSyntaxes()
 	for i := 0; i < r.Len(); i++ {
-		ls := r.Index(i)
-		if xo, found := ls.Extensions().Get(`X-ORIGIN`); found {
-			if xo.contains(x) {
-				lss.push(ls)
+		def := r.Index(i)
+		if xo, found := def.Extensions().Get(`X-ORIGIN`); found {
+			if xo.Contains(x) {
+				defs.push(def)
 			}
 		}
 	}
 
 	return
 }
-*/
 
 /*
 HumanReadable returns a Boolean value indicative of whether the receiver
