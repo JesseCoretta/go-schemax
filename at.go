@@ -1747,6 +1747,7 @@ func (r AttributeType) Map() (def DefinitionMap) {
 	def[`SUBSTR`] = []string{r.Substring().OID()}
 	def[`ORDERING`] = []string{r.Ordering().OID()}
 	def[`SYNTAX`] = []string{r.Syntax().NumericOID()}
+	def[`MUB`] = []string{itoa(int(r.MinimumUpperBounds()))}
 	def[`SINGLE-VALUE`] = []string{bool2str(r.SingleValue())}
 	def[`COLLECTIVE`] = []string{bool2str(r.Collective())}
 	def[`NO-USER-MODIFICATION`] = []string{bool2str(r.NoUserModification())}

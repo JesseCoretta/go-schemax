@@ -72,6 +72,8 @@ func (r *DefinitionMap) clean() {
 			delete(*r, k)
 		} else if len(v[0]) == 0 {
 			delete(*r, k)
+		} else if k == `MUB` && v[0] == `0` {
+			delete(*r, k)
 		}
 	}
 }
