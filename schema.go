@@ -288,6 +288,37 @@ func (r Schema) Counters() Counters {
 }
 
 /*
+Push assigns the input instance of [Definition] to the appropriate
+underlying collection. The input instance MUST be compliant.
+
+This is a fluent method.
+*/
+func (r Schema) Push(def Definition) Schema {
+	if !r.IsZero() && def.Compliant() {
+		switch def.Type() {
+		case `ldapSyntax`:
+			r.LDAPSyntaxes().Push(def)
+		case `matchingRule`:
+			r.MatchingRules().Push(def)
+		case `attributeType`:
+			r.AttributeTypes().Push(def)
+		case `matchingRuleUse`:
+			r.MatchingRuleUses().Push(def)
+		case `objectClass`:
+			r.ObjectClasses().Push(def)
+		case `dITContentRule`:
+			r.DITContentRules().Push(def)
+		case `nameForm`:
+			r.NameForms().Push(def)
+		case `dITStructureRule`:
+			r.DITStructureRules().Push(def)
+		}
+	}
+
+	return r
+}
+
+/*
 ParseRaw returns an error following an attempt to parse raw into
 usable schema definitions. This method operates similarly to the
 [Schema.ParseFile] method, except this method expects "pre-read" raw

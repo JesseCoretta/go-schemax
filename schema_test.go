@@ -48,6 +48,24 @@ func ExampleSchema_Options() {
 	// Output: true
 }
 
+/*
+This example demonstrates a convenient means of adding any [Definition]
+qualifier, such as an [ObjectClass] instance, to the schema. This is
+useful when manual type verification is cumbersome.
+*/
+func ExampleSchema_Push() {
+	def := mySchema.NewObjectClass()
+	def.SetNumericOID(`1.3.6.1.4.1.56521.999.1232`)
+	def.SetKind(AuxiliaryKind)
+	def.SetName(`exampleClass`)
+
+	mySchema.Push(def)
+	get := mySchema.ObjectClasses().Get(`exampleClass`)
+
+	fmt.Printf("%s\n", get.OID())
+	// Output: exampleClass
+}
+
 func ExampleSchema_Replace_objectClass() {
 
 	gon := mySchema.ObjectClasses().Get(`groupOfNames`)
