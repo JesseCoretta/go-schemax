@@ -1272,6 +1272,7 @@ func (r DITStructureRule) Map() (def DefinitionMap) {
 	def[`DESC`] = []string{r.Description()}
 	def[`OBSOLETE`] = []string{bool2str(r.Obsolete())}
 	def[`FORM`] = []string{r.Form().OID()}
+	def[`NOC`] = []string{r.NamedObjectClass().OID()}
 	def[`SUP`] = sups
 	def[`TYPE`] = []string{r.Type()}
 	def[`RAW`] = []string{r.String()}

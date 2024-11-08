@@ -455,6 +455,7 @@ func (r LDAPSyntax) Map() (def DefinitionMap) {
 	def[`NUMERICOID`] = []string{r.NumericOID()}
 	def[`DESC`] = []string{r.Description()}
 	def[`TYPE`] = []string{r.Type()}
+	def[`HR`] = []string{bool2str(r.HumanReadable())}
 	def[`RAW`] = []string{r.String()}
 
 	// copy our extensions from receiver r
