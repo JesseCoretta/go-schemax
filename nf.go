@@ -806,6 +806,110 @@ func (r *nameForm) setDescription(desc string) {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.NewNameForm] method.
+*/
+func (r NameForm) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `NAME`:
+			switch tv := v.(type) {
+			case string:
+				r.SetName(tv)
+			case []string:
+				r.SetName(tv...)
+			}
+		case `DESC`, `NUMERICOID`:
+			z := map[string]func(string) NameForm{
+				`DESC`:       r.SetDescription,
+				`NUMERICOID`: r.SetNumericOID,
+			}
+			switch tv := v.(type) {
+			case string:
+				z[k](tv)
+			case []string:
+				z[k](tv[0])
+			}
+		case `OBSOLETE`:
+			r.marshalBoolean(v)
+		case `OC`:
+			r.marshalOC(v)
+		case `MUST`, `MAY`:
+			r.marshalMulti(key, v)
+		default:
+			r.marshalExt(key, v)
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+func (r NameForm) marshalOC(v any) {
+	switch tv := v.(type) {
+	case []string:
+		r.SetOC(tv[0])
+	case string:
+		r.SetOC(tv)
+	}
+}
+
+func (r NameForm) marshalBoolean(v any) {
+	switch tv := v.(type) {
+	case string:
+		if eq(tv, `TRUE`) {
+			r.SetObsolete()
+		}
+	case []string:
+		if eq(tv[0], `TRUE`) {
+			r.SetObsolete()
+		}
+	case bool:
+		if tv {
+			r.SetObsolete()
+		}
+	}
+}
+
+func (r NameForm) marshalExt(key string, v any) {
+	if hasPfx(key, `X-`) {
+		switch tv := v.(type) {
+		case string:
+			r.SetExtension(key, tv)
+		case []string:
+			r.SetExtension(key, tv...)
+		}
+	}
+}
+
+func (r NameForm) marshalMulti(k string, v any) {
+	z := map[string]func(...any) NameForm{
+		`MUST`: r.SetMust,
+		`MAY`:  r.SetMay,
+	}
+	switch tv := v.(type) {
+	case []string:
+		for i := 0; i < len(tv); i++ {
+			z[k](tv[i])
+		}
+	case string:
+		z[k](tv)
+	}
+}
+
+/*
 Parse returns an error following an attempt to parse raw into the receiver
 instance.
 

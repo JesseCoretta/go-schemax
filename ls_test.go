@@ -6,6 +6,29 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[LDAPSyntax] from a map[string]any instance.
+*/
+func ExampleLDAPSyntax_Marshal() {
+	m := map[string]any{
+		`DESC`:                 `This is an example`,
+		`NUMERICOID`:           `1.3.6.1.4.1.56521.999.12.34.56`,
+		`X-NOT-HUMAN-READABLE`: `TRUE`,
+	}
+
+	var ls LDAPSyntax = mySchema.NewLDAPSyntax()
+	if err := ls.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", ls)
+	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	//     DESC 'This is an example'
+	//     X-NOT-HUMAN-READABLE 'TRUE' )
+}
+
+/*
 This example demonstrates the creation of a new [LDAPSyntax]
 instance which will be replaced in memory by another. This change
 will be recognized in any and all stacks in which the replaced

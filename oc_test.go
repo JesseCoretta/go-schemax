@@ -6,6 +6,42 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[ObjectClass] from a map[string]any instance.
+*/
+func ExampleObjectClass_Marshal() {
+	m := map[string]any{
+		`NAME`:       `exampleClass`,
+		`DESC`:       `This is an example`,
+		`NUMERICOID`: `1.3.6.1.4.1.56521.999.12.34.56`,
+		`OBSOLETE`:   `FALSE`,
+		`SUP`:        []string{`top`, `domain`},
+		`MUST`:       []string{`cn`, `sn`},
+		`MAY`:        []string{`description`},
+		`KIND`:       `STRUCTURAL`,
+		`X-ORIGIN`:   `RFCXXXX`,
+	}
+
+	var def ObjectClass = mySchema.NewObjectClass()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	//     NAME 'exampleClass'
+	//     DESC 'This is an example'
+	//     SUP ( top
+	//         $ domain )
+	//     STRUCTURAL
+	//     MUST ( cn
+	//          $ sn )
+	//     MAY description
+	//     X-ORIGIN 'RFCXXXX' )
+}
+
+/*
 This example demonstrates a compliancy check of the "account" [ObjectClass].
 */
 func ExampleObjectClass_Compliant() {

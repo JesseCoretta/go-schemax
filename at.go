@@ -59,6 +59,107 @@ func newAttributeType() *attributeType {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.AttributeType] method.
+*/
+func (r AttributeType) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `NAME`:
+			switch tv := v.(type) {
+			case string:
+				r.SetName(tv)
+			case []string:
+				r.SetName(tv...)
+			}
+		case `NUMERICOID`, `DESC`:
+			z := map[string]func(string) AttributeType{
+				`DESC`:       r.SetDescription,
+				`NUMERICOID`: r.SetNumericOID,
+			}
+			switch tv := v.(type) {
+			case string:
+				z[k](tv)
+			case []string:
+				z[k](tv[0])
+			}
+		case `OBSOLETE`, `COLLECTIVE`,
+			`NO-USER-MODIFICATION`, `SINGLE-VALUE`:
+			z := map[string]func() AttributeType{
+				`OBSOLETE`:             r.SetObsolete,
+				`NO-USER-MODIFICATION`: r.SetNoUserModification,
+				`COLLECTIVE`:           r.SetCollective,
+				`SINGLE-VALUE`:         r.SetSingleValue,
+			}
+
+			r.marshalBoolean(v, z[k])
+		case `EQUALITY`, `SYNTAX`, `SUBSTRING`, `SUP`,
+			`ORDERING`, `USAGE`, `SUBSTR`:
+			z := map[string]func(any) AttributeType{
+				`SUP`:       r.SetSuperType,
+				`SYNTAX`:    r.SetSyntax,
+				`EQUALITY`:  r.SetEquality,
+				`ORDERING`:  r.SetOrdering,
+				`SUBSTR`:    r.SetSubstring,
+				`SUBSTRING`: r.SetSubstring,
+				`USAGE`:     r.SetUsage,
+			}
+			switch tv := v.(type) {
+			case string:
+				z[k](tv)
+			case []string:
+				z[k](tv[0])
+			}
+		default:
+			r.marshalExt(key, v)
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+func (r AttributeType) marshalExt(key string, v any) {
+	if hasPfx(key, `X-`) {
+		switch tv := v.(type) {
+		case string:
+			r.SetExtension(key, tv)
+		case []string:
+			r.SetExtension(key, tv...)
+		}
+	}
+}
+
+func (r AttributeType) marshalBoolean(v any, funk func() AttributeType) {
+	switch tv := v.(type) {
+	case string:
+		if eq(tv, `TRUE`) {
+			funk()
+		}
+	case []string:
+		if eq(tv[0], `TRUE`) {
+			funk()
+		}
+	case bool:
+		if tv {
+			funk()
+		}
+	}
+}
+
+/*
 Parse returns an error following an attempt to parse raw into the receiver
 instance.
 
@@ -1452,9 +1553,9 @@ Note that a value of true will be ignored if the receiver is a collective
 
 This is a fluent method.
 */
-func (r AttributeType) SetSingleValue(x any) AttributeType {
+func (r AttributeType) SetSingleValue() AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setBoolean(`sv`, x)
+		r.attributeType.setBoolean(`sv`, true)
 	}
 
 	return r
@@ -1472,9 +1573,9 @@ Note that a value of true will be ignored if the receiver is a single-valued
 
 This is a fluent method.
 */
-func (r AttributeType) SetCollective(x any) AttributeType {
+func (r AttributeType) SetCollective() AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setBoolean(`c`, x)
+		r.attributeType.setBoolean(`c`, true)
 	}
 
 	return r
@@ -1489,9 +1590,9 @@ are used, case is not significant.
 
 This is a fluent method.
 */
-func (r AttributeType) SetNoUserModification(x any) AttributeType {
+func (r AttributeType) SetNoUserModification() AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setBoolean(`num`, x)
+		r.attributeType.setBoolean(`num`, true)
 	}
 
 	return r
@@ -1504,18 +1605,12 @@ Obsolescence cannot be unset.
 
 This is a fluent method.
 */
-func (r AttributeType) SetObsolete(x any) AttributeType {
+func (r AttributeType) SetObsolete() AttributeType {
 	if !r.IsZero() {
-		r.attributeType.setObsolete()
+		r.attributeType.setBoolean(`obs`, true)
 	}
 
 	return r
-}
-
-func (r *attributeType) setObsolete() {
-	if !r.Obsolete {
-		r.Obsolete = true
-	}
 }
 
 func (r *attributeType) setBoolean(t string, x any) {

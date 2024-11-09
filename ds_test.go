@@ -6,6 +6,34 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[DITStructureRule] from a map[string]any instance.
+*/
+func ExampleDITStructureRule_Marshal() {
+	m := map[string]any{
+		`NAME`:     `exampleRule`,
+		`DESC`:     `This is an example`,
+		`RULEID`:   1,
+		`OBSOLETE`: `FALSE`,
+		`FORM`:     `domainNameForm`,
+		`X-ORIGIN`: `RFCXXXX`,
+	}
+
+	var def DITStructureRule = mySchema.NewDITStructureRule()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 1
+	//     NAME 'exampleRule'
+	//     DESC 'This is an example'
+	//     FORM domainNameForm
+	//     X-ORIGIN 'RFCXXXX' )
+}
+
+/*
 This example demonstrates an analysis of a distinguished name to determine
 whether it honors the receiver instance of [DITStructureRule].
 

@@ -1,6 +1,6 @@
 # go-schemax
 
-Package schemax incorporates a powerful [RFC 4512](https://www.rfc-editor.org/rfc/rfc4512.txt) parser, wrapped with convenient, reflective features for creating and interrogating directory schemas.
+Package schemax (_`skee·muh·eks`_) incorporates a powerful [RFC 4512](https://www.rfc-editor.org/rfc/rfc4512.txt) parser, wrapped with convenient, reflective features for creating and interrogating directory schemas.
 
 Requires Go version 1.22 or higher.
 
@@ -109,6 +109,10 @@ Sub-directories encountered shall be traversed indefinitely and in their natural
 The general rule-of-thumb is suggests that if the `ls -l` Bash command _consistently_ lists the indicated schema files in correct order, _and_ assuming those files contain properly ordered and well-formed definitions, the parsing process should work nicely.
 
 The `ParseRaw` method is subject to the same conditions related to the order of dependent definitions.
+
+## Marshal support
+
+When needed, all `Definition` qualifier types allow for convenient population by way of an instance of `DefinitionMap` or `map[string]any` being submitted to the appropriate `Marshal` method held by the desired receiver instance.  This feature bridges the gap between other markdown languages, such as JSON, and allows easy conversion into the desired definition type.
 
 ## The Schema Itself
 

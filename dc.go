@@ -625,6 +625,101 @@ func (r DITContentRule) mayComply(must, may AttributeTypes) bool {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.NewDITContentRule] method.
+*/
+func (r DITContentRule) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `NAME`:
+			switch tv := v.(type) {
+			case string:
+				r.SetName(tv)
+			case []string:
+				r.SetName(tv...)
+			}
+		case `NUMERICOID`, `DESC`:
+			z := map[string]func(string) DITContentRule{
+				`DESC`:       r.SetDescription,
+				`NUMERICOID`: r.SetNumericOID,
+			}
+			switch tv := v.(type) {
+			case string:
+				z[k](tv)
+			case []string:
+				z[k](tv[0])
+			}
+		case `OBSOLETE`:
+			r.marshalBoolean(v)
+		case `MUST`, `MAY`, `NOT`, `AUX`:
+			r.marshalMulti(key, v)
+		default:
+			r.marshalExt(key, v)
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+func (r DITContentRule) marshalBoolean(v any) {
+	switch tv := v.(type) {
+	case string:
+		if eq(tv, `TRUE`) {
+			r.SetObsolete()
+		}
+	case []string:
+		if eq(tv[0], `TRUE`) {
+			r.SetObsolete()
+		}
+	case bool:
+		if tv {
+			r.SetObsolete()
+		}
+	}
+}
+
+func (r DITContentRule) marshalExt(key string, v any) {
+	if hasPfx(key, `X-`) {
+		switch tv := v.(type) {
+		case string:
+			r.SetExtension(key, tv)
+		case []string:
+			r.SetExtension(key, tv...)
+		}
+	}
+}
+
+func (r DITContentRule) marshalMulti(k string, v any) {
+	z := map[string]func(...any) DITContentRule{
+		`MUST`: r.SetMust,
+		`MAY`:  r.SetMay,
+		`NOT`:  r.SetNot,
+		`AUX`:  r.SetAux,
+	}
+	switch tv := v.(type) {
+	case []string:
+		for i := 0; i < len(tv); i++ {
+			z[k](tv[i])
+		}
+	case string:
+		z[k](tv)
+	}
+}
+
+/*
 Parse returns an error following an attempt to parse raw into the receiver
 instance.
 

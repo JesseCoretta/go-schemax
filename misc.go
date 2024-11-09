@@ -356,3 +356,24 @@ func strInSlice(str string, slice []string) bool {
 	}
 	return false
 }
+
+func getMarshalMap(r Definition, z any) (m map[string]any, err error) {
+	if r.IsZero() {
+		err = ErrNilReceiver
+		return
+	}
+
+	switch tv := z.(type) {
+	case map[string]any:
+		m = tv
+	case DefinitionMap:
+		m = make(map[string]any, 0)
+		for k, v := range tv {
+			m[k] = v
+		}
+	default:
+		err = ErrInvalidType
+	}
+
+	return
+}

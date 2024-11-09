@@ -678,6 +678,121 @@ func (r *dITStructureRule) setSuperRule(m ...any) {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.NewDITStructureRule] method.
+*/
+func (r DITStructureRule) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `NAME`:
+			switch tv := v.(type) {
+			case string:
+				r.SetName(tv)
+			case []string:
+				r.SetName(tv...)
+			}
+		case `DESC`:
+			switch tv := v.(type) {
+			case string:
+				r.SetDescription(tv)
+			case []string:
+				r.SetDescription(tv[0])
+			}
+		case `OBSOLETE`:
+			r.marshalBoolean(v)
+		case `RULEID`:
+			r.marshalRuleID(v)
+		case `FORM`:
+			r.marshalForm(v)
+		case `SUP`:
+			r.marshalMulti(v)
+		default:
+			r.marshalExt(key, v)
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+func (r DITStructureRule) marshalRuleID(v any) {
+	switch tv := v.(type) {
+	case string, int, uint:
+		r.SetRuleID(tv)
+	case []string:
+		r.SetRuleID(tv[0])
+	}
+}
+
+func (r DITStructureRule) marshalForm(v any) {
+	switch tv := v.(type) {
+	case []string:
+		r.SetForm(tv[0])
+	case string:
+		r.SetForm(tv)
+	}
+}
+
+func (r DITStructureRule) marshalBoolean(v any) {
+	switch tv := v.(type) {
+	case string:
+		if eq(tv, `TRUE`) {
+			r.SetObsolete()
+		}
+	case []string:
+		if eq(tv[0], `TRUE`) {
+			r.SetObsolete()
+		}
+	case bool:
+		if tv {
+			r.SetObsolete()
+		}
+	}
+}
+
+func (r DITStructureRule) marshalExt(key string, v any) {
+	if hasPfx(key, `X-`) {
+		switch tv := v.(type) {
+		case string:
+			r.SetExtension(key, tv)
+		case []string:
+			r.SetExtension(key, tv...)
+		}
+	}
+}
+
+func (r DITStructureRule) marshalMulti(v any) {
+	switch tv := v.(type) {
+	case []uint:
+		for i := 0; i < len(tv); i++ {
+			r.SetSuperRule(tv[i])
+		}
+	case []int:
+		for i := 0; i < len(tv); i++ {
+			r.SetSuperRule(tv[i])
+		}
+	case []string:
+		for i := 0; i < len(tv); i++ {
+			r.SetSuperRule(tv[i])
+		}
+	case string, int, uint:
+		r.SetSuperRule(tv)
+	}
+}
+
+/*
 Parse returns an error following an attempt to parse raw into the receiver
 instance.
 

@@ -113,6 +113,90 @@ func (r *matchingRule) replace(x MatchingRule) {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.NewMatchingRule] method.
+*/
+func (r MatchingRule) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `NAME`:
+			switch tv := v.(type) {
+			case string:
+				r.SetName(tv)
+			case []string:
+				r.SetName(tv...)
+			}
+		case `SYNTAX`:
+			switch tv := v.(type) {
+			case string:
+				r.SetSyntax(tv)
+			case []string:
+				r.SetSyntax(tv[0])
+			}
+
+		case `DESC`, `NUMERICOID`:
+			z := map[string]func(string) MatchingRule{
+				`DESC`:       r.SetDescription,
+				`NUMERICOID`: r.SetNumericOID,
+			}
+			switch tv := v.(type) {
+			case string:
+				z[k](tv)
+			case []string:
+				z[k](tv[0])
+			}
+		case `OBSOLETE`:
+			r.marshalBoolean(v)
+		default:
+			r.marshalExt(key, v)
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+func (r MatchingRule) marshalBoolean(v any) {
+	switch tv := v.(type) {
+	case string:
+		if eq(tv, `TRUE`) {
+			r.SetObsolete()
+		}
+	case []string:
+		if eq(tv[0], `TRUE`) {
+			r.SetObsolete()
+		}
+	case bool:
+		if tv {
+			r.SetObsolete()
+		}
+	}
+}
+
+func (r MatchingRule) marshalExt(key string, v any) {
+	if hasPfx(key, `X-`) {
+		switch tv := v.(type) {
+		case string:
+			r.SetExtension(key, tv)
+		case []string:
+			r.SetExtension(key, tv...)
+		}
+	}
+}
+
+/*
 Parse returns an error following an attempt to parse raw into the receiver
 instance.
 

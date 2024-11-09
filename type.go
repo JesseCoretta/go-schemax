@@ -857,6 +857,11 @@ type Definition interface {
 	//   - MatchingRuleUse instances are NOT eligible for this method
 	Parse(string) error
 
+	// Marshal returns an error following an attempt to read an
+	// instance of DefinitionMap or map[string]any into a qualifying
+	// instance.
+	Marshal(any) error
+
 	// Name returns the first string NAME value present within
 	// the underlying Name stack instance.  A zero
 	// string is returned if no names were set, or if the given

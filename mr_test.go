@@ -6,6 +6,31 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[MatchingRule] from a map[string]any instance.
+*/
+func ExampleMatchingRule_Marshal() {
+	m := map[string]any{
+		`NAME`:       `exampleMatchingRule`,
+		`DESC`:       `This is an example`,
+		`NUMERICOID`: `1.3.6.1.4.1.56521.999.12.34.56`,
+		`SYNTAX`:     `1.3.6.1.4.1.1466.115.121.1.27`,
+	}
+
+	var ls MatchingRule = mySchema.NewMatchingRule()
+	if err := ls.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", ls)
+	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	//     NAME 'exampleMatchingRule'
+	//     DESC 'This is an example'
+	//     SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+}
+
+/*
 This example demonstrates the process of parsing a raw string-based
 matchingRule definition into a proper instance of [MatchingRule].
 

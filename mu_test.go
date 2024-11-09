@@ -6,6 +6,32 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[MatchingRuleUse] from a map[string]any instance.
+*/
+func ExampleMatchingRuleUse_Marshal() {
+	m := map[string]any{
+		`NAME`:       `caseIgnoreMatch`,
+		`DESC`:       `This is an example`,
+		`NUMERICOID`: `2.5.13.2`,
+		`APPLIES`:    []string{`cn`, `sn`},
+	}
+
+	var def MatchingRuleUse = mySchema.NewMatchingRuleUse()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 2.5.13.2
+	//     NAME 'caseIgnoreMatch'
+	//     DESC 'This is an example'
+	//     APPLIES ( cn
+	//             $ sn ) )
+}
+
+/*
 This example demonstrates manual assembly of a new [MatchingRuleUse]
 instance. Note this is provided for demonstration purposes only and
 in context does not perform anything useful.

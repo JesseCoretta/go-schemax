@@ -6,6 +6,41 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[DITContentRule] from a map[string]any instance.
+*/
+func ExampleDITContentRule_Marshal() {
+	m := map[string]any{
+		`NAME`:       `exampleRule`,
+		`DESC`:       `This is an example`,
+		`NUMERICOID`: `2.5.6.6`,
+		`OBSOLETE`:   `FALSE`,
+		`AUX`:        []string{`uidObject`},
+		`MUST`:       []string{`cn`, `sn`},
+		`MAY`:        []string{`description`},
+		`NOT`:        []string{`userPassword`},
+		`X-ORIGIN`:   `RFCXXXX`,
+	}
+
+	var def DITContentRule = mySchema.NewDITContentRule()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 2.5.6.6
+	//     NAME 'exampleRule'
+	//     DESC 'This is an example'
+	//     AUX uidObject
+	//     MUST ( cn
+	//          $ sn )
+	//     MAY description
+	//     NOT userPassword
+	//     X-ORIGIN 'RFCXXXX' )
+}
+
+/*
 This example demonstrates a compliancy check of the "account" [ObjectClass].
 */
 func ExampleDITContentRule_Compliant() {

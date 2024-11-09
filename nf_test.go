@@ -6,6 +6,38 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[NameForm] from a map[string]any instance.
+*/
+func ExampleNameForm_Marshal() {
+	m := map[string]any{
+		`NAME`:       `exampleForm`,
+		`DESC`:       `This is an example`,
+		`NUMERICOID`: `1.3.6.1.4.1.56521.999.12.34.56`,
+		`OBSOLETE`:   `FALSE`,
+		`OC`:         `person`,
+		`MUST`:       `cn`,
+		`MAY`:        `o`,
+		`X-ORIGIN`:   `RFCXXXX`,
+	}
+
+	var def NameForm = mySchema.NewNameForm()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	//     NAME 'exampleForm'
+	//     DESC 'This is an example'
+	//     OC person
+	//     MUST cn
+	//     MAY o
+	//     X-ORIGIN 'RFCXXXX' )
+}
+
+/*
 This example demonstrates the creation of a new instance of [NameForm].
 
 Note: this example assumes a legitimate schema variable is defined

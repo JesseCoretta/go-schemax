@@ -10,6 +10,47 @@ import (
 )
 
 /*
+This example demonstrates the means for marshaling an instance of
+[AttributeType] from a map[string]any instance.
+*/
+func ExampleAttributeType_Marshal() {
+	m := map[string]any{
+		`NAME`:                 `exampleAttributeType`,
+		`DESC`:                 `This is an example`,
+		`NUMERICOID`:           `1.3.6.1.4.1.56521.999.12.34.56`,
+		`COLLECTIVE`:           `FALSE`,
+		`NO-USER-MODIFICATION`: `TRUE`,
+		`SINGLE-VALUE`:         `TRUE`,
+		`OBSOLETE`:             `FALSE`,
+		`EQUALITY`:             `integerMatch`,
+		`ORDERING`:             `integerOrderingMatch`,
+		`SUBSTR`:               `caseIgnoreSubstringsMatch`,
+		`SYNTAX`:               `1.3.6.1.4.1.1466.115.121.1.27`,
+		`USAGE`:                `dSAOperation`,
+		`X-ORIGIN`:             `RFCXXXX`,
+	}
+
+	var def AttributeType = mySchema.NewAttributeType()
+	if err := def.Marshal(m); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("%s\n", def)
+	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	//     NAME 'exampleAttributeType'
+	//     DESC 'This is an example'
+	//     EQUALITY integerMatch
+	//     SUBSTR caseIgnoreSubstringsMatch
+	//     ORDERING integerOrderingMatch
+	//     SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+	//     SINGLE-VALUE
+	//     NO-USER-MODIFICATION
+	//     USAGE dSAOperation
+	//     X-ORIGIN 'RFCXXXX' )
+}
+
+/*
 This example demonstrates the means of gathering references to every
 superior [AttributeType] in the relevant super type chain.
 
@@ -285,7 +326,7 @@ func ExampleNewAttributeType() {
 		SetSyntax(dStr).
 		SetMinimumUpperBounds(64).
 		SetEquality(cIM).
-		SetSingleValue(true).
+		SetSingleValue().
 		SetExtension(`X-ORIGIN`, `NOWHERE`).
 		SetStringer() // use default stringer
 
@@ -1053,11 +1094,11 @@ func TestAttributeType_codecov(t *testing.T) {
 	}
 	zz.superChain()
 	zz.setSuperType(mySchema.AttributeTypes().Get(`cn`))
-	zz.SetCollective(rune(88))
-	zz.SetCollective(true)
-	zz.SetObsolete(true)
-	zz.SetObsolete(`true`)
-	zz.SetNoUserModification(true)
+	zz.SetCollective()
+	zz.SetCollective()
+	zz.SetObsolete()
+	zz.SetObsolete()
+	zz.SetNoUserModification()
 	zz.SetUsage(`directoryOperation`)
 	zz.Usage()
 	zz.SetUsage(`distributedOperation`)

@@ -66,6 +66,55 @@ func (r LDAPSyntaxes) contains(id string) bool {
 }
 
 /*
+Marshal returns an error following an attempt to marshal the contents of
+def, which may be either a [DefinitionMap] or map[string]any instance.
+
+The receiver instance must be initialized prior to use of this method
+using the [Schema.NewLDAPSyntax] method.
+*/
+func (r LDAPSyntax) Marshal(def any) error {
+	m, err := getMarshalMap(r, def)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range m {
+		switch key := uc(k); key {
+		case `DESC`:
+			switch tv := v.(type) {
+			case string:
+				r.SetDescription(tv)
+			case []string:
+				r.SetDescription(tv[0])
+			}
+		case `NUMERICOID`:
+			switch tv := v.(type) {
+			case string:
+				r.SetNumericOID(tv)
+			case []string:
+				r.SetNumericOID(tv[0])
+			}
+		default:
+			if hasPfx(key, `X-`) {
+				switch tv := v.(type) {
+				case string:
+					r.SetExtension(key, tv)
+				case []string:
+					r.SetExtension(key, tv...)
+				}
+			}
+		}
+	}
+
+	if !r.Compliant() {
+		return ErrDefNonCompliant
+	}
+	r.SetStringer()
+
+	return nil
+}
+
+/*
 SetData assigns x to the receiver instance. This is a general-use method and has no
 specific intent beyond convenience. The contents may be subsequently accessed via the
 [LDAPSyntax.Data] method.
