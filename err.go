@@ -19,7 +19,7 @@ var (
 	ErrNilInput                    error = errors.New("Input instance is nil")
 	ErrNilDef                      error = errors.New("Referenced definition is nil or not specified")
 	ErrNilSchemaRef                error = errors.New("Receiver instance lacks a Schema reference")
-	ErrDefNonCompliant             error = errors.New("Definition failed compliancy checks")
+	ErrDefNonCompliant             error = errors.New("Definition failed compliance checks")
 	ErrInvalidInput                error = errors.New("Input instance not compatible")
 	ErrInvalidSyntax               error = errors.New("Value does not meet the prescribed syntax qualifications")
 	ErrInvalidValue                error = errors.New("Value does not meet the prescribed value qualifications")
