@@ -83,6 +83,19 @@ func (r NameForm) Map() (def DefinitionMap) {
 }
 
 /*
+E returns the underlying error instance.
+*/
+func (r NameForm) E() (err error) {
+	if !r.IsZero() {
+		err = r.nameForm.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
+/*
 NewNameForm initializes and returns a new instance of [NameForm],
 ready for manual assembly.  This method need not be used when creating
 new [NameForm] instances by way of parsing, as that is handled on an
@@ -169,8 +182,10 @@ func (r NameForm) Replace(x NameForm) NameForm {
 
 func (r *nameForm) replace(x NameForm) {
 	if r.OID == `` {
+		r.err = ErrMissingNumericOID
 		return
 	} else if r.OID != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -209,6 +224,13 @@ func (r NameForm) EnforcedBy() (dsr DITStructureRules) {
 
 	return
 }
+
+/*
+Identifier returns the output of [NameForm.OID] and is merely used for
+an interface-friendly means of obtaining the principal identifier of
+the receiver instance.
+*/
+func (r NameForm) Identifier() (ident string) { return r.OID() }
 
 /*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
@@ -281,7 +303,12 @@ func (r NameForm) Compliant() bool {
 		}
 	}
 
-	return mct > 0
+	ok := mct > 0
+	if ok {
+		r.nameForm.err = nil
+	}
+
+	return ok
 }
 
 /*
@@ -373,8 +400,13 @@ func (r NameForm) SetName(name ...string) NameForm {
 }
 
 func (r *nameForm) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -402,6 +434,8 @@ func (r *nameForm) setNumericOID(id string) {
 		if len(r.OID) == 0 {
 			r.OID = id
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -518,6 +552,10 @@ func (r *nameForm) setMay(m ...any) {
 			r.May.Push(at)
 		}
 	}
+
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -584,6 +622,10 @@ func (r *nameForm) setMust(m ...any) {
 		if err == nil && !at.IsZero() {
 			r.Must.Push(at)
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -673,8 +715,10 @@ func (r *nameForm) setStringer(function ...Stringer) {
 		stringer = function[0]
 	}
 
+	var err error
 	if stringer == nil {
-		str, err := r.prepareString() // perform one-time text/template op
+		var str string
+		str, err = r.prepareString() // perform one-time text/template op
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
@@ -684,6 +728,10 @@ func (r *nameForm) setStringer(function ...Stringer) {
 		}
 	} else {
 		r.stringer = stringer
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -757,6 +805,10 @@ func (r *nameForm) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return
@@ -1150,6 +1202,8 @@ func (r *nameForm) setOC(x any) {
 
 	if !oc.IsZero() && oc.Kind() == StructuralKind {
 		r.Structural = oc
+	} else {
+		r.err = ErrIncompatStructuralClass
 	}
 }
 

@@ -23,6 +23,19 @@ func (r DITContentRule) Description() (desc string) {
 }
 
 /*
+E returns the underlying error instance.
+*/
+func (r DITContentRule) E() (err error) {
+	if !r.IsZero() {
+		err = r.dITContentRule.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
+/*
 DITContentRules returns the [DITContentRules] instance from within
 the receiver instance.
 */
@@ -344,6 +357,13 @@ func (r DITContentRules) oIDsStringer(_ ...any) (present string) {
 }
 
 /*
+Identifier returns the output of [DITContentRule.OID] and is merely used
+for an interface-friendly means of obtaining the principal identifier
+of the receiver instance.
+*/
+func (r DITContentRule) Identifier() (ident string) { return r.OID() }
+
+/*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
 either the numericOID or descriptor of the receiver instance.  Case is
 not significant in the matching process.
@@ -424,6 +444,10 @@ func (r *dITContentRule) setAux(m ...any) {
 		if err == nil && oc.Kind() == AuxiliaryKind {
 			r.Aux.Push(oc)
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -522,7 +546,12 @@ func (r DITContentRule) Compliant() bool {
 	// if any dITStructureRule definitions exist,
 	// make sure they don't produce a MUST/NOT
 	// conflict.
-	return r.dsrComply(structural)
+	ok := r.dsrComply(structural)
+	if ok {
+		r.dITContentRule.err = nil
+	}
+
+	return ok
 }
 
 func (r DITContentRule) dsrComply(structural ObjectClass) bool {
@@ -782,8 +811,13 @@ func (r DITContentRule) SetName(x ...string) DITContentRule {
 }
 
 func (r *dITContentRule) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -882,8 +916,12 @@ func (r *dITContentRule) setNumericOID(id string) {
 			oc := r.schema.ObjectClasses().Get(id)
 			if oc.Kind() == StructuralKind {
 				r.OID = oc
+			} else {
+				r.err = ErrIncompatStructuralClass
 			}
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -932,6 +970,10 @@ func (r *dITContentRule) setMust(m ...any) {
 			r.Must.Push(at)
 		}
 	}
+
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -977,6 +1019,10 @@ func (r *dITContentRule) setMay(m ...any) {
 			r.May.Push(at)
 		}
 	}
+
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -1021,6 +1067,10 @@ func (r *dITContentRule) setNot(m ...any) {
 		if err == nil && !at.IsZero() {
 			r.Not.Push(at)
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -1083,6 +1133,8 @@ func (r *dITContentRule) setStringer(function ...Stringer) {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 	} else {
 		r.stringer = stringer
@@ -1171,6 +1223,10 @@ func (r *dITContentRule) prepareString() (str string, err error) {
 			// the return (string) value.
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return
@@ -1344,7 +1400,11 @@ func (r DITContentRule) Replace(x DITContentRule) DITContentRule {
 }
 
 func (r *dITContentRule) replace(x DITContentRule) {
-	if r.OID.NumericOID() != x.NumericOID() {
+	if r.OID.NumericOID() == `` {
+		r.err = ErrMissingNumericOID
+		return
+	} else if r.OID.NumericOID() != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 

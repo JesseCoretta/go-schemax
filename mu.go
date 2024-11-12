@@ -195,8 +195,10 @@ func (r MatchingRuleUse) Replace(x MatchingRuleUse) MatchingRuleUse {
 
 func (r *matchingRuleUse) replace(x MatchingRuleUse) {
 	if r.OID.IsZero() {
+		r.err = ErrMissingNumericOID
 		return
 	} else if r.OID.NumericOID() != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -210,6 +212,19 @@ func (r *matchingRuleUse) replace(x MatchingRuleUse) {
 	r.schema = x.matchingRuleUse.schema
 	r.stringer = x.matchingRuleUse.stringer
 	r.data = x.matchingRuleUse.data
+}
+
+/*
+E returns the underlying error instance.
+*/
+func (r MatchingRuleUse) E() (err error) {
+	if !r.IsZero() {
+		err = r.matchingRuleUse.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
 }
 
 /*
@@ -256,7 +271,12 @@ func (r MatchingRuleUse) Compliant() bool {
 		return false
 	}
 
-	return act == r.Applies().Len()
+	ok := act == r.Applies().Len()
+	if ok {
+		r.matchingRuleUse.err = nil
+	}
+
+	return ok
 }
 
 /*
@@ -341,10 +361,12 @@ func (r *matchingRuleUse) setStringer(function ...Stringer) {
 		stringer = function[0]
 	}
 
+	var err error
 	if stringer == nil {
 		// no user provided closure means we
 		// defer to a general use stringer.
-		str, err := r.prepareString() // perform one-time text/template op
+		var str string
+		str, err = r.prepareString() // perform one-time text/template op
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
@@ -353,6 +375,10 @@ func (r *matchingRuleUse) setStringer(function ...Stringer) {
 			}
 		}
 		return
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	// assign user-provided closure
@@ -469,6 +495,10 @@ func (r *matchingRuleUse) setApplies(m ...any) {
 			r.Applies.Push(at)
 		}
 	}
+
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -512,6 +542,13 @@ func (r *matchingRuleUse) getSchema() (s Schema) {
 
 	return
 }
+
+/*
+Identifier returns the output of [MatchingRuleUse.OID] and is merely used
+for an interface-friendly means of obtaining the principal identifier
+of the receiver instance.
+*/
+func (r MatchingRuleUse) Identifier() (ident string) { return r.OID() }
 
 /*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
@@ -744,6 +781,8 @@ func (r *matchingRuleUse) setNumericOID(id string) {
 	// and when the MR has been found.
 	if !mr.IsZero() && r.OID.IsZero() {
 		r.OID = mr
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -789,8 +828,13 @@ func (r MatchingRuleUse) SetName(x ...string) MatchingRuleUse {
 }
 
 func (r *matchingRuleUse) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 

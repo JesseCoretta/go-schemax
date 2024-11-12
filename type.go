@@ -399,6 +399,7 @@ type attributeType struct {
 	Usage      uint
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	valQual  ValueQualifier
@@ -454,6 +455,7 @@ type dITContentRule struct {
 	Not        AttributeTypes
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	data     any
@@ -512,6 +514,7 @@ type dITStructureRule struct {
 	SuperRules DITStructureRules
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	data     any
@@ -552,6 +555,7 @@ type lDAPSyntax struct {
 	Desc       string
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	synQual  SyntaxQualifier
@@ -605,6 +609,7 @@ type matchingRule struct {
 	Syntax     LDAPSyntax
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	assMatch AssertionMatcher
@@ -662,6 +667,7 @@ type matchingRuleUse struct {
 	Applies    AttributeTypes
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	data     any
@@ -716,6 +722,7 @@ type nameForm struct {
 	May        AttributeTypes
 	Extensions Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	data     any
@@ -776,6 +783,7 @@ type objectClass struct {
 	May          AttributeTypes
 	Extensions   Extensions
 
+	err      error
 	schema   Schema
 	stringer Stringer
 	data     any
@@ -846,6 +854,16 @@ type Definition interface {
 	// Data returns the underlying user-assigned value present
 	// within the receiver instance.
 	Data() any
+
+	// Identifier returns the principal identifier of the receiver
+	// instance as a string. Value sources vary greatly depending
+	// on the underlying type of instance.
+	Identifier() string
+
+	// E returns the underlying error instance present within the
+	// receiver instance. Errors are cleared following a successful
+	// run of the associated Compliant method.
+	E() error
 
 	// Parse returns an error following an attempt read the string
 	// input value into the receiver instance.

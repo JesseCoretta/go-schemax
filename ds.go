@@ -1,7 +1,5 @@
 package schemax
 
-//import "fmt"
-
 /*
 ds.go contains all DIT structure rule related methods and functions.
 */
@@ -51,6 +49,19 @@ func (r DITStructureRule) schema() (s Schema) {
 }
 
 /*
+E returns the underlying error instance.
+*/
+func (r DITStructureRule) E() (err error) {
+	if !r.IsZero() {
+		err = r.dITStructureRule.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
+/*
 Replace overrides the receiver with x. Both must bear an identical
 numeric rule ID and x MUST be compliant.
 
@@ -81,6 +92,7 @@ func (r *dITStructureRule) replace(x DITStructureRule) {
 	if r == nil {
 		r = newDITStructureRule()
 	} else if r.ID != x.RuleID() {
+		r.err = ErrInvalidRuleID
 		return
 	}
 
@@ -248,6 +260,7 @@ func (r DITStructureRule) Compliant() bool {
 	// not apply.
 	dc := r.schema().DITContentRules().Get(form.OC().OID())
 	if dc.IsZero() {
+		r.dITStructureRule.err = nil
 		return true
 	}
 
@@ -261,6 +274,8 @@ func (r DITStructureRule) Compliant() bool {
 			return false
 		}
 	}
+
+	r.dITStructureRule.err = nil
 
 	return true
 }
@@ -334,6 +349,21 @@ func (r DITStructureRule) ID() (id string) {
 		if id = r.Name(); len(id) == 0 {
 			id = _id
 		}
+	}
+
+	return
+}
+
+/*
+Identifier returns the first available instance identifier, which will
+either be the DESC clause (output of [DITStructureRule.Name]) or the
+rule identifier (output of [DITStructureRule.ID]). This method is merely
+present to offer a convenient interface-friendly means of obtaining
+the principal identifier of the receiver instance.
+*/
+func (r DITStructureRule) Identifier() (ident string) {
+	if ident = r.Name(); len(ident) == 0 {
+		ident = r.ID()
 	}
 
 	return
@@ -475,8 +505,10 @@ func (r *dITStructureRule) setStringer(function ...Stringer) {
 		stringer = function[0]
 	}
 
+	var err error
 	if stringer == nil {
-		str, err := r.prepareString() // perform one-time text/template op
+		var str string
+		str, err = r.prepareString() // perform one-time text/template op
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
@@ -486,6 +518,10 @@ func (r *dITStructureRule) setStringer(function ...Stringer) {
 		}
 	} else {
 		r.stringer = stringer
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -525,8 +561,13 @@ func (r DITStructureRule) SetName(x ...string) DITStructureRule {
 }
 
 func (r *dITStructureRule) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -618,6 +659,7 @@ func (r DITStructureRule) SetRuleID(id any) DITStructureRule {
 }
 
 func (r *dITStructureRule) setRuleID(x any) {
+	var err error
 	switch tv := x.(type) {
 	case uint64:
 		r.ID = uint(tv)
@@ -626,11 +668,21 @@ func (r *dITStructureRule) setRuleID(x any) {
 	case int:
 		if tv >= 0 {
 			r.ID = uint(tv)
+		} else {
+			err = ErrInvalidRuleID
 		}
 	case string:
 		if z, ok := atoui(tv); ok {
 			r.ID = z
+		} else {
+			err = ErrInvalidRuleID
 		}
+	default:
+		err = ErrInvalidRuleID
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return
@@ -655,7 +707,8 @@ func (r DITStructureRule) SetSuperRule(m ...any) DITStructureRule {
 }
 
 func (r *dITStructureRule) setSuperRule(m ...any) {
-	for i := 0; i < len(m); i++ {
+	var err error
+	for i := 0; i < len(m) && err == nil; i++ {
 		var def DITStructureRule
 		switch tv := m[i].(type) {
 		case uint64, uint, int:
@@ -670,10 +723,15 @@ func (r *dITStructureRule) setSuperRule(m ...any) {
 		case DITStructureRule:
 			def = tv
 		default:
+			err = ErrInvalidRuleID
 			continue
 		}
 
 		r.SuperRules.Push(def)
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -864,6 +922,8 @@ func (r *dITStructureRule) setForm(x any) {
 
 	if !def.IsZero() {
 		r.Form = def
+	} else {
+		r.err = ErrNameFormNotFound
 	}
 }
 
@@ -1424,6 +1484,10 @@ func (r *dITStructureRule) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return

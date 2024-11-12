@@ -11,6 +11,32 @@ func NewLDAPSyntaxes() LDAPSyntaxes {
 }
 
 /*
+E returns the underlying error instance.
+*/
+func (r LDAPSyntax) E() (err error) {
+	if !r.IsZero() {
+		err = r.lDAPSyntax.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
+/*
+Identifier returns the first available instance identifier, which will
+either be the DESC clause (output of [LDAPSyntax.Description]) or the
+numeric OID (output of [LDAPSyntax.NumericOID]).
+*/
+func (r LDAPSyntax) Identifier() (ident string) {
+	if ident = r.Description(); len(ident) == 0 {
+		ident = r.NumericOID()
+	}
+
+	return
+}
+
+/*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
 either the numericOID or description of the receiver instance.  Case is
 not significant in the matching process.
@@ -207,7 +233,11 @@ func (r LDAPSyntaxes) Compliant() bool {
 Compliant returns a Boolean value indicative of the receiver being fully
 compliant per the required clauses of [§ 4.1.5 of RFC 4512]:
 
+  - Instance must not be nil
   - Numeric OID must be present and valid
+
+Successful returns result in the annihilation of the underlying error
+instance.
 
 [§ 4.1.5 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.5
 */
@@ -216,7 +246,13 @@ func (r LDAPSyntax) Compliant() bool {
 		return false
 	}
 
-	return isNumericOID(r.lDAPSyntax.OID)
+	ok := isNumericOID(r.lDAPSyntax.OID)
+	if ok {
+		r.lDAPSyntax.err = nil
+	}
+
+	return ok
+
 }
 
 /*
@@ -280,6 +316,8 @@ func (r *lDAPSyntax) setStringer(function ...Stringer) {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 		return
 	}
@@ -444,6 +482,8 @@ func (r *lDAPSyntax) setNumericOID(id string) {
 		if len(r.OID) == 0 {
 			r.OID = id
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -800,8 +840,10 @@ func (r LDAPSyntax) Replace(x LDAPSyntax) LDAPSyntax {
 
 func (r *lDAPSyntax) replace(x LDAPSyntax) {
 	if r.OID == `` {
+		r.err = ErrMissingNumericOID
 		return
 	} else if r.OID != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -836,6 +878,10 @@ func (r *lDAPSyntax) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return

@@ -107,6 +107,45 @@ func ExampleDITStructureRule_NamedObjectClass() {
 }
 
 /*
+This example demonstrates the means for checking to see if the receiver
+is in an error condition.
+*/
+func ExampleDITStructureRule_E() {
+	def := mySchema.NewDITStructureRule()
+	def.SetRuleID("Z") // bogus
+	if err := def.E(); err != nil {
+		fmt.Println(err)
+	}
+	// Output: Invalid integer identifier for structure rule
+}
+
+/*
+This example demonstrates the means for resolving an error condition.
+*/
+func ExampleDITStructureRule_E_clearError() {
+	def := mySchema.NewDITStructureRule()
+	def.SetRuleID(`X`) // bogus
+
+	// We realized our mistake.
+	def.SetRuleID(30) // valid
+	def.SetForm(`domainNameForm`)
+
+	// But when we check again, the error is still there.
+	if err := def.E(); err != nil {
+		// handle error
+	}
+
+	// We must clear the error with a
+	// passing compliance check.
+	if def.Compliant(); def.E() == nil {
+		fmt.Println("Error has been resolved")
+	}
+	// Output: Error has been resolved
+
+	return
+}
+
+/*
 This example demonstrates a compliancy check of a [DITStructureRule]
 instance.
 

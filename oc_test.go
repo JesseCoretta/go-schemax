@@ -42,6 +42,44 @@ func ExampleObjectClass_Marshal() {
 }
 
 /*
+This example demonstrates the means for checking to see if the receiver
+is in an error condition.
+*/
+func ExampleObjectClass_E() {
+	def := mySchema.NewObjectClass()
+	def.SetNumericOID(`23jklm5.1`) // bogus
+	if err := def.E(); err != nil {
+		fmt.Println(err)
+	}
+	// Output: Numeric OID is invalid
+}
+
+/*
+This example demonstrates the means for resolving an error condition.
+*/
+func ExampleObjectClass_E_clearError() {
+	def := mySchema.NewObjectClass()
+	def.SetNumericOID(`23jklm5.1`) // bogus
+
+	// We realized our mistake.
+	def.SetNumericOID(`1.3.6.1.4.1.56521.999.8.4.1.1`) // valid
+
+	// But when we check again, the error is still there.
+	if def.E() != nil {
+		//fmt.Println(... the error ...)
+	}
+
+	// We must clear the error with a
+	// passing compliance check.
+	if def.Compliant(); def.E() == nil {
+		fmt.Println("Error has been resolved")
+	}
+	// Output: Error has been resolved
+
+	return
+}
+
+/*
 This example demonstrates a compliancy check of the "account" [ObjectClass].
 */
 func ExampleObjectClass_Compliant() {

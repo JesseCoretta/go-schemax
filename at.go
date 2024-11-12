@@ -131,6 +131,19 @@ func (r AttributeType) Marshal(def any) error {
 	return nil
 }
 
+/*
+E returns the underlying error instance.
+*/
+func (r AttributeType) E() (err error) {
+	if !r.IsZero() {
+		err = r.attributeType.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
 func (r AttributeType) marshalExt(key string, v any) {
 	if hasPfx(key, `X-`) {
 		switch tv := v.(type) {
@@ -234,8 +247,10 @@ func (r AttributeType) Replace(x AttributeType) AttributeType {
 
 func (r *attributeType) replace(x AttributeType) {
 	if r.OID == `` {
+		r.err = ErrMissingNumericOID
 		return
 	} else if r.OID != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -714,6 +729,13 @@ func (r AttributeType) IsZero() bool {
 }
 
 /*
+Identifier returns the output of [AttributeType.OID] and is merely used
+for an interface-friendly means of obtaining the principal identifier
+of the receiver instance.
+*/
+func (r AttributeType) Identifier() (ident string) { return r.OID() }
+
+/*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
 either the numericOID or descriptor of the receiver instance.  Case is
 not significant in the matching process.
@@ -864,6 +886,8 @@ func (r *attributeType) setNumericOID(id string) {
 		if len(r.OID) == 0 {
 			r.OID = id
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -916,8 +940,13 @@ func (r AttributeType) SetName(x ...string) AttributeType {
 }
 
 func (r *attributeType) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -1039,6 +1068,8 @@ func (r *attributeType) setStringer(function ...Stringer) {
 				// Return a static value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 		return
 	}
@@ -1098,6 +1129,10 @@ func (r *attributeType) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return
@@ -1221,6 +1256,8 @@ func (r *attributeType) setSyntax(x any) {
 
 	if def.Compliant() {
 		r.Syntax = def
+	} else {
+		r.err = ErrInvalidSyntax
 	}
 }
 
@@ -1295,6 +1332,8 @@ func (r *attributeType) setEquality(x any) {
 
 	if def.Compliant() {
 		r.Equality = def
+	} else {
+		r.err = ErrEqualityRuleNotFound
 	}
 }
 
@@ -1369,6 +1408,8 @@ func (r *attributeType) setSubstring(x any) {
 
 	if def.Compliant() {
 		r.Substring = def
+	} else {
+		r.err = ErrSubstringRuleNotFound
 	}
 }
 
@@ -1443,6 +1484,8 @@ func (r *attributeType) setOrdering(x any) {
 
 	if def.Compliant() {
 		r.Ordering = def
+	} else {
+		r.err = ErrOrderingRuleNotFound
 	}
 }
 
@@ -1538,6 +1581,8 @@ func (r *attributeType) setSuperType(x any) {
 
 	if def.Compliant() {
 		r.SuperType = def
+	} else {
+		r.err = ErrSuperTypeNotFound
 	}
 }
 
@@ -1808,7 +1853,12 @@ func (r AttributeType) Compliant() bool {
 
 	// Any combination of SV/C is permitted
 	// EXCEPT for BOTH.  See RFC 3671.
-	return !(r.SingleValue() && collective)
+	ok := !(r.SingleValue() && collective)
+	if ok {
+		r.attributeType.err = nil
+	}
+
+	return ok
 }
 
 /*

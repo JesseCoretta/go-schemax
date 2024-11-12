@@ -65,6 +65,19 @@ func newMatchingRule() *matchingRule {
 }
 
 /*
+E returns the underlying error instance.
+*/
+func (r MatchingRule) E() (err error) {
+	if !r.IsZero() {
+		err = r.matchingRule.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
+}
+
+/*
 Replace overrides the receiver with x. Both must bear an identical
 numeric OID and x MUST be compliant.
 
@@ -93,8 +106,10 @@ func (r MatchingRule) Replace(x MatchingRule) MatchingRule {
 
 func (r *matchingRule) replace(x MatchingRule) {
 	if r.OID == `` {
+		r.err = ErrMissingNumericOID
 		return
 	} else if r.OID != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -309,6 +324,8 @@ func (r *matchingRule) setNumericOID(id string) {
 		if len(r.OID) == 0 {
 			r.OID = id
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 
 	return
@@ -415,6 +432,8 @@ func (r *matchingRule) setSyntax(x any) {
 
 	if !def.IsZero() {
 		r.Syntax = def
+	} else {
+		r.err = ErrInvalidSyntax
 	}
 }
 
@@ -503,6 +522,13 @@ func (r MatchingRule) Description() (desc string) {
 	}
 	return
 }
+
+/*
+Identifier returns the output of [MatchingRule.OID] and is merely used
+for an interface-friendly means of obtaining the principal identifier
+of the receiver instance.
+*/
+func (r MatchingRule) Identifier() (ident string) { return r.OID() }
 
 /*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
@@ -621,8 +647,13 @@ func (r MatchingRule) SetName(x ...string) MatchingRule {
 }
 
 func (r *matchingRule) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -850,6 +881,10 @@ func (r *matchingRule) prepareString() (str string, err error) {
 		}
 	}
 
+	if err != nil {
+		r.err = err
+	}
+
 	return
 }
 
@@ -908,7 +943,12 @@ func (r MatchingRules) Compliant() bool {
 Compliant returns a Boolean value indicative of the receiver being fully
 compliant per the required clauses of [§ 4.1.3 of RFC 4512]:
 
+  - Instance must not be nil
   - Numeric OID must be present and valid
+  - Underlying [LDAPSyntax] instance must be valid
+
+Successful returns result in the annihilation of the underlying error
+instance.
 
 [§ 4.1.3 of RFC 4512]: https://rfc-editor.org/rfc/rfc4512.html#section-4.1.3
 */
@@ -921,7 +961,12 @@ func (r MatchingRule) Compliant() bool {
 		return false
 	}
 
-	return r.Syntax().Compliant()
+	ok := r.Syntax().Compliant()
+	if ok {
+		r.matchingRule.err = nil
+	}
+
+	return ok
 }
 
 /*
@@ -985,6 +1030,8 @@ func (r *matchingRule) setStringer(function ...Stringer) {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 		return
 	}

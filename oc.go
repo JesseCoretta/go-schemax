@@ -290,8 +290,13 @@ func (r ObjectClass) SetName(x ...string) ObjectClass {
 }
 
 func (r *objectClass) setName(x ...string) {
+	b4 := r.Name.Len()
 	for i := 0; i < len(x); i++ {
 		r.Name.Push(x[i])
+	}
+
+	if r.Name.Len()-len(x) != b4 {
+		r.err = ErrInvalidNames
 	}
 }
 
@@ -421,6 +426,9 @@ func (r *objectClass) setMust(m ...any) {
 		}
 	}
 
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -453,6 +461,10 @@ func (r *objectClass) setMay(m ...any) {
 		if err == nil && !at.IsZero() {
 			r.May.Push(at)
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 }
 
@@ -491,6 +503,10 @@ func (r *objectClass) setSuperClass(x ...any) {
 			r.SuperClasses.push(sup)
 		}
 	}
+
+	if err != nil {
+		r.err = err
+	}
 }
 
 /*
@@ -521,7 +537,11 @@ func (r ObjectClass) Replace(x ObjectClass) ObjectClass {
 }
 
 func (r *objectClass) replace(x ObjectClass) {
-	if r.OID != x.NumericOID() {
+	if r.OID == `` {
+		r.err = ErrMissingNumericOID
+		return
+	} else if r.OID != x.NumericOID() {
+		r.err = ErrInvalidOID
 		return
 	}
 
@@ -657,7 +677,26 @@ func (r ObjectClass) Compliant() bool {
 		}
 	}
 
-	return isNumericOID(r.NumericOID())
+	ok := isNumericOID(r.NumericOID())
+	if ok {
+		r.objectClass.err = nil
+	}
+
+	return ok
+
+}
+
+/*
+E returns the underlying error instance.
+*/
+func (r ObjectClass) E() (err error) {
+	if !r.IsZero() {
+		err = r.objectClass.err
+	} else {
+		err = ErrNilReceiver
+	}
+
+	return
 }
 
 /*
@@ -1009,6 +1048,13 @@ func (r ObjectClass) OID() (oid string) {
 }
 
 /*
+Identifier returns the output of [ObjectClass.OID] and is merely used
+for an interface-friendly means of obtaining the principal identifier
+of the receiver instance.
+*/
+func (r ObjectClass) Identifier() (ident string) { return r.OID() }
+
+/*
 IsIdentifiedAs returns a Boolean value indicative of whether id matches
 either the numericOID or descriptor of the receiver instance.  Case is
 not significant in the matching process.
@@ -1132,6 +1178,8 @@ func (r *objectClass) setNumericOID(id string) {
 		if len(r.OID) == 0 {
 			r.OID = id
 		}
+	} else {
+		r.err = ErrInvalidOID
 	}
 }
 
@@ -1206,6 +1254,8 @@ func (r *objectClass) setStringer(function ...Stringer) {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 	} else {
 		r.stringer = stringer
@@ -1291,6 +1341,10 @@ func (r *objectClass) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return
