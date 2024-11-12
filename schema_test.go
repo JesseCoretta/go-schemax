@@ -66,6 +66,12 @@ func ExampleSchema_Push() {
 	// Output: exampleClass
 }
 
+func ExampleSchema_Exists() {
+	var def Definition = mySchema.LDAPSyntaxes().Get(`integer`)
+	fmt.Println(mySchema.Exists(def))
+	// Output: true
+}
+
 func ExampleSchema_Replace_objectClass() {
 
 	gon := mySchema.ObjectClasses().Get(`groupOfNames`)
@@ -203,6 +209,7 @@ func TestSchema_codecov(t *testing.T) {
 		mySchema.DITStructureRules().Index(0),
 	} {
 		mySchema.Replace(def)
+		mySchema.Exists(def)
 	}
 
 	mySchema.Replace(LDAPSyntax{})

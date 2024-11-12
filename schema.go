@@ -319,6 +319,37 @@ func (r Schema) Push(def Definition) Schema {
 }
 
 /*
+Exists returns a Boolean value indicative of whether the receiver instance
+contains a matching [Definition] type and identifier.
+*/
+func (r Schema) Exists(def Definition) (exists bool) {
+	if def == nil {
+		return
+	}
+
+	switch def.Type() {
+	case `ldapSyntax`:
+		exists = !r.LDAPSyntaxes().Get(def.NumericOID()).IsZero()
+	case `matchingRule`:
+		exists = !r.MatchingRules().Get(def.NumericOID()).IsZero()
+	case `attributeType`:
+		exists = !r.AttributeTypes().Get(def.NumericOID()).IsZero()
+	case `matchingRuleUse`:
+		exists = !r.MatchingRuleUses().Get(def.NumericOID()).IsZero()
+	case `objectClass`:
+		exists = !r.ObjectClasses().Get(def.NumericOID()).IsZero()
+	case `dITContentRule`:
+		exists = !r.DITContentRules().Get(def.NumericOID()).IsZero()
+	case `nameForm`:
+		exists = !r.NameForms().Get(def.NumericOID()).IsZero()
+	case `dITStructureRule`:
+		exists = !r.DITStructureRules().Get(def.(DITStructureRule).RuleID()).IsZero()
+	}
+
+	return
+}
+
+/*
 ParseRaw returns an error following an attempt to parse raw into
 usable schema definitions. This method operates similarly to the
 [Schema.ParseFile] method, except this method expects "pre-read" raw
