@@ -13,11 +13,10 @@ func ExampleNameForm_Marshal() {
 	m := map[string]any{
 		`NAME`:       `exampleForm`,
 		`DESC`:       `This is an example`,
-		`NUMERICOID`: `1.3.6.1.4.1.56521.999.12.34.56`,
+		`NUMERICOID`: `1.3.6.1.4.1.56521.999.412.34.56`,
 		`OBSOLETE`:   `FALSE`,
 		`OC`:         `person`,
 		`MUST`:       `cn`,
-		`MAY`:        `o`,
 		`X-ORIGIN`:   `RFCXXXX`,
 	}
 
@@ -25,15 +24,17 @@ func ExampleNameForm_Marshal() {
 	if err := def.Marshal(m); err != nil {
 		fmt.Println(err)
 		return
+	} else if err = def.E(); err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	fmt.Printf("%s\n", def)
-	// Output: ( 1.3.6.1.4.1.56521.999.12.34.56
+	// Output: ( 1.3.6.1.4.1.56521.999.412.34.56
 	//     NAME 'exampleForm'
 	//     DESC 'This is an example'
 	//     OC person
 	//     MUST cn
-	//     MAY o
 	//     X-ORIGIN 'RFCXXXX' )
 }
 

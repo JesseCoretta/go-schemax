@@ -505,24 +505,21 @@ func (r *dITStructureRule) setStringer(function ...Stringer) {
 		stringer = function[0]
 	}
 
-	var err error
 	if stringer == nil {
-		var str string
-		str, err = r.prepareString() // perform one-time text/template op
+		str, err := r.prepareString() // perform one-time text/template op
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
-	} else {
-		r.stringer = stringer
+		return
 	}
 
-	if err != nil {
-		r.err = err
-	}
+	r.stringer = stringer
 }
 
 /*

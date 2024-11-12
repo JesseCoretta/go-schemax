@@ -361,24 +361,20 @@ func (r *matchingRuleUse) setStringer(function ...Stringer) {
 		stringer = function[0]
 	}
 
-	var err error
 	if stringer == nil {
 		// no user provided closure means we
 		// defer to a general use stringer.
-		var str string
-		str, err = r.prepareString() // perform one-time text/template op
+		str, err := r.prepareString() // perform one-time text/template op
 		if err == nil {
 			// Save the stringer
 			r.stringer = func() string {
 				// Return a preserved value.
 				return str
 			}
+		} else {
+			r.err = err
 		}
 		return
-	}
-
-	if err != nil {
-		r.err = err
 	}
 
 	// assign user-provided closure
@@ -596,6 +592,10 @@ func (r *matchingRuleUse) prepareString() (str string, err error) {
 		}); err == nil {
 			str = buf.String()
 		}
+	}
+
+	if err != nil {
+		r.err = err
 	}
 
 	return

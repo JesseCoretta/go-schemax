@@ -1136,9 +1136,10 @@ func (r *dITContentRule) setStringer(function ...Stringer) {
 		} else {
 			r.err = err
 		}
-	} else {
-		r.stringer = stringer
+		return
 	}
+
+	r.stringer = stringer
 }
 
 /*
