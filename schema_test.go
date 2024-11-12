@@ -555,9 +555,9 @@ func TestLoads_codecov(t *testing.T) {
 
 // supplemental attributeTypes not sourced from an official doc, but
 // are useful in UTs, et al.
-var suplATs []string = []string{
-	`( 2.5.18.9 NAME 'hasSubordinates' DESC 'X.501: entry has children' EQUALITY booleanMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE NO-USER-MODIFICATION USAGE directoryOperation )`,
-}
+//
+// Currently empty.
+var suplATs []string = []string{}
 
 func init() {
 	// Prepare our UT/Example reference schema
@@ -3213,7 +3213,7 @@ nameform ( 1.3.6.1.4.1.56521.101.2.7.3
 #
 # 2.8.1.  'rootArcStructure'
 #
-ditstructurerule ( 0
+ditstructurerule ( 20
 	NAME 'rootArcStructure'
 	DESC 'structure rule for root arc entries in any dimension; FOR DEMONSTRATION USE ONLY'
 	FORM nRootArcForm
@@ -3221,7 +3221,7 @@ ditstructurerule ( 0
 #
 # 2.8.2.  'arcStructure'
 #
-ditstructurerule ( 1
+ditstructurerule ( 21
 	NAME 'arcStructure'
 	DESC 'structure rule for three dimensional arc entries; FOR DEMONSTRATION USE ONLY'
 	FORM nArcForm
@@ -3230,7 +3230,7 @@ ditstructurerule ( 1
 #
 # 2.8.3  'dotNotArcStructure'
 #
-ditstructurerule ( 2
+ditstructurerule ( 22
 	NAME 'dotNotArcStructure'
 	DESC 'structure rule for two dimensional arc entries; FOR DEMONSTRATION USE ONLY'
 	FORM dotNotationArcForm

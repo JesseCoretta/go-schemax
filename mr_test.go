@@ -515,8 +515,8 @@ func TestMatchingRule_codecov(t *testing.T) {
 	def.SetData(nil)
 	def.Data()
 
-	if err := def.Parse(raw); err != nil {
-		t.Errorf("%s failed: expected success, got %v", t.Name(), err)
+	if err := def.Parse(raw); err != ErrDuplicateDef {
+		t.Errorf("%s failed: expected duplicate err, got %v", t.Name(), err)
 		return
 	}
 	_ = def.macro()

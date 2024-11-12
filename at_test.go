@@ -884,8 +884,8 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleAttributeType_SetSyntax() {
 	// First we'll craft a fake attribute
-	raw := `( 1.3.6.1.4.1.56521.999.14.56.1
-                NAME 'coolattr'
+	raw := `( 1.3.6.1.4.1.56521.999.14.56.12
+                NAME 'coolattr2'
 		EQUALITY caseIgnoreMatch )`
 
 	var attr AttributeType = mySchema.NewAttributeType()
@@ -911,8 +911,8 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleAttributeType_SetEquality() {
 	// First we'll craft a fake attribute
-	raw := `( 1.3.6.1.4.1.56521.999.14.56.1
-                NAME 'coolattr'
+	raw := `( 1.3.6.1.4.1.56521.999.14.56.13
+                NAME 'coolattr3'
 		SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )`
 
 	var attr AttributeType = mySchema.NewAttributeType()
@@ -938,8 +938,8 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleAttributeType_SetSubstring() {
 	// First we'll craft a fake attribute
-	raw := `( 1.3.6.1.4.1.56521.999.14.56.1
-                NAME 'coolattr'
+	raw := `( 1.3.6.1.4.1.56521.999.14.56.14
+                NAME 'coolattr4'
                 SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )`
 
 	var attr AttributeType = mySchema.NewAttributeType()
@@ -965,8 +965,8 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleAttributeType_SetOrdering() {
 	// First we'll craft a fake attribute
-	raw := `( 1.3.6.1.4.1.56521.999.14.56.1
-                NAME 'coolattr'
+	raw := `( 1.3.6.1.4.1.56521.999.14.56.15
+                NAME 'coolattr5'
                 SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )`
 
 	var attr AttributeType = mySchema.NewAttributeType()

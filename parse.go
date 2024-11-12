@@ -199,8 +199,9 @@ func (r Schema) marshalLS(s antlr4512.LDAPSyntax) (def LDAPSyntax, err error) {
 		return
 	}
 
-	// silently ignore attempts to marshal a duplicate definition.
+	// fail attempts to marshal a duplicate definition.
 	if lup := r.LDAPSyntaxes().get(s.OID); !lup.IsZero() {
+		err = ErrDuplicateDef
 		return
 	}
 
@@ -246,6 +247,12 @@ func (r Schema) marshalMR(s antlr4512.MatchingRule) (def MatchingRule, err error
 		if found {
 			s.OID = mc + `.` + s.Macro[1]
 		}
+	}
+
+	// fail attempts to marshal a duplicate definition.
+	if lup := r.MatchingRules().get(s.OID); !lup.IsZero() {
+		err = ErrDuplicateDef
+		return
 	}
 
 	if !isNumericOID(s.OID) {
@@ -323,6 +330,12 @@ func (r Schema) marshalMU(s antlr4512.MatchingRuleUse) (def MatchingRuleUse, err
 		return
 	}
 
+	// fail attempts to marshal a duplicate definition.
+	if lup := r.MatchingRuleUses().get(s.OID); !lup.IsZero() {
+		err = ErrDuplicateDef
+		return
+	}
+
 	_def := newMatchingRuleUse()
 	_def.OID = lup
 	_def.Desc = s.Desc
@@ -380,7 +393,8 @@ func (r Schema) marshalAT(s antlr4512.AttributeType) (def AttributeType, err err
 		err = ErrMissingNumericOID
 		return
 	} else if lup := r.AttributeTypes().get(s.OID); !lup.IsZero() {
-		// silently ignore attempts to marshal a duplicate definition.
+		// fail on attempts to marshal a duplicate definition.
+		err = ErrDuplicateDef
 		return
 	}
 
@@ -520,8 +534,9 @@ func (r Schema) marshalOC(s antlr4512.ObjectClass) (def ObjectClass, err error) 
 		return
 	}
 
-	// silently ignore attempts to marshal a duplicate definition.
+	// fail attempts to marshal a duplicate definition.
 	if lup := r.ObjectClasses().get(s.OID); !lup.IsZero() {
+		err = ErrDuplicateDef
 		return
 	}
 
@@ -607,6 +622,17 @@ func (r Schema) incorporateDC(s antlr4512.DITContentRules) (err error) {
 	return
 }
 
+func (r Schema) checkDCOID(s antlr4512.DITContentRule) (err error) {
+	if soc := r.ObjectClasses().Get(s.OID); soc.IsZero() {
+		err = mkerr(ErrObjectClassNotFound.Error() + `( superclass: ` + s.OID + `)`)
+	} else if lup := r.DITContentRules().get(s.OID); !lup.IsZero() {
+		// fail attempts to marshal a duplicate definition.
+		err = ErrDuplicateDef
+	}
+
+	return
+}
+
 func (r Schema) marshalDC(s antlr4512.DITContentRule) (def DITContentRule, err error) {
 	if !isNumericOID(s.OID) {
 		err = ErrMissingNumericOID
@@ -615,11 +641,10 @@ func (r Schema) marshalDC(s antlr4512.DITContentRule) (def DITContentRule, err e
 
 	_def := newDITContentRule()
 
-	soc := r.ObjectClasses().Get(s.OID)
-	if soc.IsZero() {
-		err = mkerr(ErrObjectClassNotFound.Error() + `( superclass: ` + s.OID + `)`)
+	if err = r.checkDCOID(s); err != nil {
 		return
 	}
+	soc := r.ObjectClasses().Get(s.OID)
 
 	_def.OID = soc
 	_def.Desc = s.Desc
@@ -707,6 +732,12 @@ func (r Schema) marshalNF(s antlr4512.NameForm) (def NameForm, err error) {
 		return
 	}
 
+	// fail attempts to marshal a duplicate definition.
+	if lup := r.NameForms().get(s.OID); !lup.IsZero() {
+		err = ErrDuplicateDef
+		return
+	}
+
 	_def := newNameForm()
 	_def.OID = s.OID
 	_def.Desc = s.Desc
@@ -778,6 +809,12 @@ func (r Schema) marshalDS(s antlr4512.DITStructureRule) (def DITStructureRule, e
 	var ok bool
 	if ruleid, ok = atoui(s.ID); !ok {
 		err = mkerr("Invalid structure rule ID " + s.ID)
+		return
+	}
+
+	// fail attempts to marshal a duplicate definition.
+	if lup := r.DITStructureRules().get(ruleid); !lup.IsZero() {
+		err = ErrDuplicateDef
 		return
 	}
 

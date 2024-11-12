@@ -158,9 +158,8 @@ func ExampleDITContentRule_SetData() {
 	// use a string for simplicity.
 	documentation := `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`
 
-	// Obtain the target attribute type to bear
-	// the assigned value.
-	dvc := mySchema.DITContentRules().Index(0)
+	// Pretend this is a real dITContentRule
+	dvc := mySchema.NewDITContentRule()
 
 	// Set it.
 	dvc.SetData(documentation)
@@ -398,8 +397,8 @@ func TestDITContentRule_codecov(t *testing.T) {
 	def.SetNot(mySchema.AttributeTypes().Get(`l`))
 	def.Map()
 	mySchema.DITContentRules().canPush(DITContentRule{}, DITContentRule{new(dITContentRule)})
-	if err := def.Parse(raw); err != nil {
-		t.Errorf("%s failed: expected success, got %v", t.Name(), err)
+	if err := def.Parse(raw); err != ErrDuplicateDef {
+		t.Errorf("%s failed: expected duplicate err, got %v", t.Name(), err)
 		return
 	}
 	def.StructuralClass().EnforcedBy()

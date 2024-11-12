@@ -12,6 +12,7 @@ var (
 	ErrNamingViolationUnsanctioned error = errors.New("Naming violation; unsanctioned attribute type used")
 	ErrNamingViolationChildlessSSR error = errors.New("Naming violation; childless superior structure rule")
 	ErrNamingViolationBadClassAttr error = errors.New("Naming violation; named object class does not facilitate one or more attribute types present")
+	ErrDuplicateDef                error = errors.New("Cannot parse or load; duplicate definition")
 	ErrNilSyntaxQualifier          error = errors.New("No SyntaxQualifier instance assigned to LDAPSyntax")
 	ErrNilValueQualifier           error = errors.New("No ValueQualifier instance assigned to AttributeType")
 	ErrNilAssertionMatcher         error = errors.New("No AssertionMatcher instance assigned to MatchingRule")

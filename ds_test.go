@@ -115,7 +115,7 @@ in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleDITStructureRule_Compliant() {
 	// grab our dITStructureRule bearing an ID of zero (0)
-	ds := mySchema.DITStructureRules().Get(0) // or "rootArcStructure"
+	ds := mySchema.DITStructureRules().Get(20) // or "rootArcStructure"
 	fmt.Println(ds.Compliant())
 	// Output: true
 }
@@ -148,8 +148,8 @@ in place of the fictional "mySchema" var shown here for simplicity.
 func ExampleDITStructureRules_XOrigin() {
 	defs := mySchema.DITStructureRules()
 	matches := defs.XOrigin(`RFC4403`)
-	fmt.Printf("Matched %d of %d %s\n", matches.Len(), defs.Len(), defs.Type())
-	// Output: Matched 10 of 15 dITStructureRules
+	fmt.Printf("Matched %d %s\n", matches.Len(), defs.Type())
+	// Output: Matched 10 dITStructureRules
 }
 
 /*
@@ -202,7 +202,7 @@ Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleDITStructureRule_ID() {
-	def := mySchema.DITStructureRules().Get(0)
+	def := mySchema.DITStructureRules().Get(20)
 	fmt.Println(def.ID())
 	// Output: rootArcStructure
 }
@@ -217,7 +217,7 @@ in place of the fictional "mySchema" var shown here for simplicity.
 func ExampleDITStructureRule_RuleID() {
 	def := mySchema.DITStructureRules().Get(`arcStructure`) // or 11, or "11"
 	fmt.Println(def.RuleID())
-	// Output: 11
+	// Output: 0
 }
 
 /*
@@ -228,7 +228,7 @@ Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleDITStructureRule_Name() {
-	def := mySchema.DITStructureRules().Get(0)
+	def := mySchema.DITStructureRules().Get(20)
 	fmt.Println(def.Name())
 	// Output: rootArcStructure
 }
@@ -286,9 +286,9 @@ method and may return zero (0) or more [DITStructureRule] instances within
 the return [DITStructureRules] instance.
 */
 func ExampleDITStructureRule_SubRules() {
-	def := mySchema.DITStructureRules().Get(0)
-	fmt.Printf("%d subordinate rules found", def.SubRules().Len())
-	// Output: 2 subordinate rules found
+	def := mySchema.DITStructureRules().Get(5)
+	fmt.Printf("%d subordinate rule found", def.SubRules().Len())
+	// Output: 1 subordinate rule found
 }
 
 /*
@@ -314,7 +314,7 @@ Note: this example assumes a legitimate schema variable is defined
 in place of the fictional "mySchema" var shown here for simplicity.
 */
 func ExampleDITStructureRule_Map() {
-	def := mySchema.DITStructureRules().Get(0)
+	def := mySchema.DITStructureRules().Get(20)
 	fmt.Println(def.Map()[`NAME`][0])
 	// Output: rootArcStructure
 }
@@ -363,7 +363,7 @@ func ExampleDITStructureRule_SetData() {
 }
 
 func ExampleDITStructureRule_IsIdentifiedAs() {
-	def := mySchema.DITStructureRules().Get(0)
+	def := mySchema.DITStructureRules().Get(20)
 	fmt.Println(def.IsIdentifiedAs(`rootArcStructure`))
 	// Output: true
 }
