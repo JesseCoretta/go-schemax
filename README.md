@@ -21,6 +21,10 @@ Two (2) releases are available for end-users:
 
 ## History of schemax
 
+The schemax package is now archived. The API is stable and affords all of the functionality I ever needed. Enjoy!
+
+---
+
 The goal of schemax has always been to provide a reliable parsing subsystem for directory schema definitions that allows transformation into usable Go objects.
 
 The original design of schemax (version < 1.5.0) involved a custom-made parser. While this design performed remarkably well for years, it was not without its shortcomings. 
